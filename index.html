@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鸣潮词条分数计算器</title>
+    <link rel="icon" type="image/jpeg" href="https://pic1.imgdb.cn/item/6885d68758cb8da5c8e446a6.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+                <h1><img src="https://pic1.imgdb.cn/item/6885d68758cb8da5c8e446a6.png" alt="鸣潮图标" style="width: 50px; height: 50px; vertical-align: middle;"> 鸣潮词条分数计算器</h1>
+                <p>根据词条数值和权重计算分数</p>
+            </div>
+        </header>
+
+        <!-- 计算公式说明 -->
+        <div class="formula-section">
+            <div class="formula-box">
+                <div class="formula-header">
+                    <h3>📐 计算公式</h3>
+                    <div class="formula">词条得分 = (词条数值 × 当前词条权重 ÷ 未对齐最高分) × 对齐分数(50)</div>
+                </div>
+                <div class="formula-controls">
+                    <div class="score-settings">
+                        <div class="score-setting-item">
+                            <label for="maxScoreMain">未对齐最高分：</label>
+                            <input type="number" id="maxScoreMain" value="100" min="1" step="0.1" onchange="updateMaxScore()">
+                            <span class="unit">分</span>
+                        </div>
+                        <div class="score-setting-item">
+                            <label for="alignScoreMain">对齐分数：</label>
+                            <input type="number" id="alignScoreMain" value="50" min="1" step="0.1" onchange="updateAlignmentScore()">
+                            <span class="unit">分</span>
+                        </div>
+                    </div>
+                    <!-- 鸣谢信息放入公式框 -->
+                    <div class="formula-acknowledgment">
+                        <p>🙏鸣谢 计算公式、权重等信息均来自 <a href="https://github.com/tyql688/WutheringWavesUID" target="_blank" rel="noopener noreferrer">WutheringWavesUID (wwuid)</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <main class="main-content">
+            <!-- 移动端侧边栏 -->
+            <div class="mobile-sidebar" id="mobileSidebar">
+                <div class="sidebar-header">
+                    <h3><img src="https://pic1.imgdb.cn/item/68871ded58cb8da5c8e7bfd5.png" alt="角色模板" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;"> 角色模板</h3>
+                    <button class="sidebar-close-btn" id="sidebarCloseBtn">×</button>
+                </div>
+                <div class="sidebar-content">
+                    <div class="template-selector">
+                        <label for="mobileCharacterSelect">选择角色：</label>
+                        <select id="mobileCharacterSelect">
+                            <option value="">请选择角色</option>
+                        </select>
+                    </div>
+                    
+                    <div class="template-tabs">
+                        <button class="tab-btn active" data-tab="c4">4费位</button>
+                        <button class="tab-btn" data-tab="c3">3费位</button>
+                        <button class="tab-btn" data-tab="c1">1费位</button>
+                    </div>
+
+                    <div class="template-content" id="mobileTemplateContent">
+                        <p>请选择角色</p>
+                    </div>
+
+                    <div class="template-actions">
+                        <button id="mobileApplyTemplate" class="apply-btn">应用模板</button>
+                        <button id="mobileClearTemplate" class="clear-btn">清除选择</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 侧边栏遮罩 -->
+            <div class="sidebar-overlay" id="sidebarOverlay"></div>
+            
+            <div class="content-wrapper">
+                <div class="left-panel">
+                    <!-- 移动端角色模板入口 -->
+                    <div class="mobile-template-entry">
+                        <div class="template-entry-card">
+                            <div class="template-entry-icon">
+                                <img src="https://pic1.imgdb.cn/item/68871ded58cb8da5c8e7bfd5.png" alt="角色模板" style="width: 32px; height: 32px;">
+                            </div>
+                            <div class="template-entry-content">
+                                <h4>角色模板</h4>
+                                <p>快速应用角色推荐配置</p>
+                            </div>
+                            <button class="template-entry-btn" id="templateEntryBtn">
+                                <span>选择角色</span>
+                                <span class="arrow">→</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-section">
+                        <table class="entries-table">
+                            <thead>
+                                <tr>
+                                    <th>词条位置</th>
+                                    <th>属性类型</th>
+                                    <th>数值</th>
+                                    <th>权重</th>
+                                    <th>分数</th>
+                                </tr>
+                            </thead>
+                            <tbody id="entriesTableBody">
+                                <!-- 表格内容将由JavaScript生成 -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="total-score">
+                        <h3>总分数: <span id="totalScore">0.00</span></h3>
+                    </div>
+                </div>
+
+                <div class="right-panel">
+                    <div class="template-section">
+                        <h3><img src="https://pic1.imgdb.cn/item/68871ded58cb8da5c8e7bfd5.png" alt="角色模板" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;"> 角色模板</h3>
+                        <div class="template-selector">
+                            <label for="characterSelect">选择角色：</label>
+                            <select id="characterSelect">
+                                <option value="">请选择角色</option>
+                            </select>
+                        </div>
+                        
+                        <div class="template-tabs">
+                            <button class="tab-btn active" data-tab="c4">4费位</button>
+                            <button class="tab-btn" data-tab="c3">3费位</button>
+                            <button class="tab-btn" data-tab="c1">1费位</button>
+                        </div>
+
+                        <div class="template-content" id="templateContent">
+                            <p>请选择角色</p>
+                        </div>
+
+                        <div class="template-actions">
+                            <button id="applyTemplate" class="apply-btn">应用模板</button>
+                            <button id="clearTemplate" class="clear-btn">清除选择</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

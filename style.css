@@ -1,0 +1,1731 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+                url('https://pic1.imgdb.cn/item/688988fc58cb8da5c8eee4ab.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    height: 100vh;
+    color: #333;
+    overflow: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 0;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+}
+
+/* 头部样式 - 紧凑版 */
+header {
+    position: relative;
+    text-align: center;
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    flex-shrink: 0;
+}
+
+header h1 {
+    font-size: 1.8em;
+    margin-bottom: 5px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+header p {
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* 主要内容区域 */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* 内容包装器 - 左右分栏 */
+.content-wrapper {
+    display: flex;
+    gap: 15px;
+    flex: 1;
+    min-height: 0;
+}
+
+.left-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.right-panel {
+    width: 300px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: calc(100vh - 36px); /* 进一步减少高度，确保按钮完全可见 */
+}
+
+/* 角色模板区域 */
+.template-section {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 15px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.template-section h3 {
+    margin: 0 0 15px 0;
+    color: #4a5568;
+    font-size: 1.1em;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 8px;
+}
+
+.template-selector {
+    margin-bottom: 10px;
+}
+
+.template-selector label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 14px;
+}
+
+.template-selector select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    transition: border-color 0.3s;
+}
+
+.template-selector select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* 模板标签页 */
+.template-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 6px 10px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    color: #4a5568;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.tab-btn:hover {
+    background: #f7fafc;
+    border-color: #cbd5e0;
+}
+
+.tab-btn.active {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border-color: #667eea;
+}
+
+/* 模板内容 */
+.template-content {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 12px;
+    min-height: 200px; /* 设置最小高度 */
+    max-height: calc(100vh - 480px); /* 动态计算最大高度，为按钮和其他元素留出足够空间 */
+    min-width: 280px; /* 设置最小宽度 */
+    max-width: 100%; /* 限制最大宽度不超过容器 */
+    width: 100%; /* 确保占满容器宽度 */
+    padding: 6px;
+    background: rgba(247, 250, 252, 0.5);
+    border-radius: 6px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-sizing: border-box; /* 确保padding包含在宽度内 */
+}
+
+/* 桌面端模板内容滚动条样式 */
+.template-content::-webkit-scrollbar {
+    width: 10px;
+}
+
+.template-content::-webkit-scrollbar-track {
+    background: rgba(226, 232, 240, 0.8);
+    border-radius: 5px;
+    margin: 2px;
+}
+
+.template-content::-webkit-scrollbar-thumb {
+    background: rgba(102, 126, 234, 0.7);
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.template-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(102, 126, 234, 0.9);
+}
+
+.template-content::-webkit-scrollbar-thumb:active {
+    background: rgba(102, 126, 234, 1);
+}
+
+.template-tab {
+    display: none;
+}
+
+.template-tab.active {
+    display: block;
+}
+
+.template-tab h4 {
+    margin: 0 0 6px 0;
+    color: #4a5568;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.template-props {
+    display: grid;
+    gap: 4px;
+}
+
+.prop-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 8px;
+    background: #f7fafc;
+    border-radius: 4px;
+    border-left: 3px solid #e2e8f0;
+    font-size: 11px;
+}
+
+.prop-item.has-value {
+    border-left-color: #667eea;
+    background: #edf2f7;
+}
+
+.prop-name {
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.prop-value {
+    color: #667eea;
+    font-weight: 600;
+}
+
+/* 分数最大值区域样式 */
+.score-max-section {
+    background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border: 2px solid rgba(102, 126, 234, 0.3);
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.score-max-section h4 {
+    margin: 0 0 2px 0;
+    color: #4a5568;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.score-max-value {
+    font-size: 14px;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.prop-value.zero {
+    color: #a0aec0;
+}
+
+/* 模板操作按钮 */
+.template-actions {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+    margin-top: auto;
+    padding: 10px 15px;
+    border-top: 2px solid rgba(226, 232, 240, 0.8);
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 0 0 10px 10px;
+    margin: 0 -15px -15px -15px;
+    min-height: 60px; /* 确保按钮区域有最小高度 */
+    align-items: center;
+    z-index: 10; /* 确保按钮在最上层 */
+    backdrop-filter: blur(10px); /* 添加背景模糊效果 */
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+}
+
+.apply-btn, .clear-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-height: 36px; /* 确保按钮有最小高度 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.apply-btn {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+}
+
+.apply-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.apply-btn:disabled {
+    background: #a0aec0;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.clear-btn {
+    background: #f7fafc;
+    color: #4a5568;
+    border: 2px solid #e2e8f0;
+}
+
+.clear-btn:hover {
+    background: #edf2f7;
+    border-color: #cbd5e0;
+}
+
+/* 公式区域样式 - 紧凑版 */
+.formula-section {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    margin-bottom: 10px;
+    flex-shrink: 0;
+}
+
+.formula-box {
+    padding: 12px 15px;
+}
+
+.formula-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.formula-header h3 {
+    margin: 0;
+    color: #4a5568;
+    font-size: 1em;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.formula {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    text-align: center;
+    flex: 1;
+    min-width: 300px;
+}
+
+.formula-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.score-settings {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.score-setting-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.score-setting-item label {
+    font-size: 12px;
+    color: #4a5568;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.score-setting-item input {
+    width: 60px;
+    padding: 4px 6px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 12px;
+    text-align: center;
+}
+
+.score-setting-item input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 1px rgba(102, 126, 234, 0.2);
+}
+
+.guide {
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+}
+
+/* 表格区域 */
+.table-section {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 15px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.entries-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex: 1;
+}
+
+.entries-table th,
+.entries-table td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 13px;
+}
+
+.entries-table th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    text-align: center;
+    font-size: 12px;
+    height: 35px;
+}
+
+.entries-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.entries-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.entry-position {
+    font-weight: 600;
+    color: #333;
+    font-size: 12px;
+}
+
+.entry-position.main {
+    color: #e74c3c;
+}
+
+.entry-position.sub {
+    color: #3498db;
+}
+
+.table-select,
+.table-input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+    transition: border-color 0.3s ease;
+}
+
+.table-select:focus,
+.table-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 1px rgba(102, 126, 234, 0.2);
+}
+
+.table-input[readonly] {
+    background-color: #f8f9fa;
+    color: #666;
+}
+
+.entry-score {
+    font-weight: 600;
+    color: #27ae60;
+    text-align: center;
+    font-size: 12px;
+}
+
+/* 总分数样式 - 紧凑版 */
+.total-score {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.total-score h3 {
+    font-size: 1.2em;
+    margin: 0;
+}
+/* 机器人提示样式 */
+.bot-tip {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.bot-tip p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.bot-tip strong {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* 表格权重输入框样式 */
+.table-input.weight-editable {
+    background: #fff3e0;
+    border: 1px solid #ff9800;
+}
+
+.table-input.weight-editable:focus {
+    background: #ffffff;
+    border-color: #f57c00;
+    box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.2);
+}
+
+/* 移动端角色模板入口 */
+.mobile-template-entry {
+    display: none;
+    margin-bottom: 20px;
+}
+
+.template-entry-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 16px;
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.template-entry-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.template-entry-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+    animation: bounce 2s infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.template-entry-icon img {
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-5px);
+    }
+    60% {
+        transform: translateY(-3px);
+    }
+}
+
+.template-entry-content {
+    flex: 1;
+}
+
+.template-entry-content h4 {
+    margin: 0 0 4px 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.template-entry-content p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.template-entry-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    color: white;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.template-entry-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.template-entry-btn .arrow {
+    transition: transform 0.3s ease;
+}
+
+.template-entry-btn:hover .arrow {
+    transform: translateX(4px);
+}
+
+/* 移动端菜单按钮 */
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.mobile-menu-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.hamburger-line {
+    width: 24px;
+    height: 3px;
+    background-color: #fff;
+    margin: 2px 0;
+    transition: 0.3s;
+    border-radius: 2px;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* 移动端侧边栏 */
+.mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 320px;
+    height: 100vh;
+    min-height: 400px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: 1000;
+    transition: left 0.3s ease;
+    overflow: hidden;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-sidebar.active {
+    left: 0;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    min-height: 60px;
+}
+
+.sidebar-header h3 {
+    color: #fff;
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.sidebar-close-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar-close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-content {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.template-selector {
+    flex-shrink: 0;
+    margin-bottom: 15px;
+}
+
+.template-tabs {
+    flex-shrink: 0;
+    margin-bottom: 15px;
+    display: flex;
+    gap: 5px;
+}
+
+.template-content {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    min-height: 150px; /* 设置最小高度 */
+    max-height: calc(100vh - 300px); /* 改为动态计算，确保按钮区域可见 */
+    min-width: 250px; /* 设置最小宽度 */
+    max-width: 100%; /* 限制最大宽度不超过容器 */
+    width: 100%; /* 确保占满容器宽度 */
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-sizing: border-box; /* 确保padding包含在宽度内 */
+}
+
+.template-actions {
+    position: sticky;
+    bottom: 0;
+    flex-shrink: 0;
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+    padding: 12px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 0 0 8px 8px;
+    margin: 0 -20px -20px -20px;
+    min-height: 60px; /* 确保按钮区域有最小高度 */
+    align-items: center;
+    z-index: 10; /* 确保按钮在最上层 */
+    backdrop-filter: blur(10px); /* 添加背景模糊效果 */
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 移动端侧边栏模板内容滚动条样式 */
+.mobile-sidebar .template-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mobile-sidebar .template-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.mobile-sidebar .template-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.mobile-sidebar .template-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* 移动端侧边栏响应式优化 */
+@media (max-height: 600px) {
+    .sidebar-header {
+        padding: 15px 20px;
+    }
+    
+    .sidebar-header h3 {
+        font-size: 1.1em;
+    }
+    
+    .sidebar-content {
+        padding: 15px 20px;
+    }
+    
+    .template-selector {
+        margin-bottom: 12px;
+    }
+    
+    .template-tabs {
+        margin-bottom: 12px;
+    }
+    
+    .template-content {
+        margin-bottom: 12px;
+        min-height: 120px; /* 小屏幕减少最小高度 */
+        max-height: calc(100vh - 250px); /* 调整最大高度 */
+    }
+    
+    .tab-btn {
+        padding: 5px 8px;
+        font-size: 10px;
+    }
+    
+    .apply-btn,
+    .clear-btn {
+        padding: 6px 10px;
+        font-size: 10px;
+    }
+}
+
+@media (max-height: 500px) {
+    .sidebar-header {
+        padding: 10px 20px;
+    }
+    
+    .sidebar-header h3 {
+        font-size: 1em;
+    }
+    
+    .sidebar-content {
+        padding: 10px 20px;
+    }
+    
+    .template-selector {
+        margin-bottom: 8px;
+    }
+    
+    .template-tabs {
+        margin-bottom: 8px;
+    }
+    
+    .template-content {
+        margin-bottom: 8px;
+        font-size: 10px;
+        min-height: 100px; /* 极小屏幕进一步减少最小高度 */
+        max-height: calc(100vh - 200px); /* 调整最大高度 */
+    }
+    
+    .template-selector label {
+        font-size: 11px;
+    }
+    
+    .template-selector select {
+        font-size: 11px;
+        padding: 4px 6px;
+    }
+}
+
+/* 移动端显示菜单按钮，隐藏桌面端角色模板 */
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex;
+    }
+    
+    .right-panel {
+        display: none !important;
+    }
+    
+    .header-content {
+        justify-content: flex-start;
+    }
+    
+    .header-content h1 {
+        font-size: 1.3em;
+    }
+    
+    .header-content p {
+        font-size: 0.9em;
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) and (min-width: 770px) {
+    /* 中等屏幕优化：确保词条表格占主要部分 */
+    .content-wrapper {
+        gap: 12px;
+    }
+    
+    .left-panel {
+        flex: 2.5; /* 增加左侧面板比重 */
+        min-width: 0;
+    }
+    
+    .right-panel {
+        flex: 1; /* 改为flex布局，减少右侧面板比重 */
+        width: auto;
+        max-width: 280px; /* 限制最大宽度 */
+        min-width: 240px; /* 设置最小宽度 */
+    }
+    
+    /* 优化模板区域内容 */
+    .template-section {
+        padding: 12px;
+    }
+    
+    .template-section h3 {
+        font-size: 1em;
+        margin-bottom: 10px;
+    }
+    
+    .template-selector {
+        margin-bottom: 10px;
+    }
+    
+    .template-selector select {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+    
+    .tab-btn {
+        padding: 6px 8px;
+        font-size: 11px;
+    }
+    
+    .template-content {
+        margin-bottom: 10px;
+        min-height: 180px; /* 中等屏幕的最小高度 */
+        max-height: calc(100vh - 420px); /* 调整最大高度适应中等屏幕 */
+        min-width: 220px; /* 设置最小宽度 */
+    }
+    
+    .prop-item {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    .apply-btn, .clear-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 769px) {
+    .main-content {
+        flex-direction: column;
+    }
+    
+    .left-panel,
+    .right-panel {
+        width: 100%;
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        overflow-y: auto;
+        font-size: 14px;
+    }
+    
+    .container {
+        height: auto;
+        min-height: 100vh;
+        padding: 5px;
+        overflow-x: hidden;
+    }
+    
+    header {
+        padding: 10px;
+        text-align: center;
+    }
+    
+    header h1 {
+        font-size: 1.3em;
+        line-height: 1.4;
+        margin-bottom: 5px;
+    }
+    
+    header h1 img {
+        width: 35px !important;
+        height: 35px !important;
+    }
+    
+    header p {
+        font-size: 12px;
+        margin: 0;
+    }
+    
+    /* 公式区域移动端优化 */
+    .formula-section {
+        margin-bottom: 8px;
+    }
+    
+    .formula-box {
+        padding: 8px 10px;
+    }
+    
+    .formula-header {
+        flex-direction: column;
+        gap: 8px;
+        align-items: stretch;
+    }
+    
+    .formula-header h3 {
+        font-size: 14px;
+        text-align: center;
+    }
+    
+    .formula {
+        font-size: 11px;
+        padding: 6px 8px;
+        min-width: auto;
+        word-break: break-all;
+        line-height: 1.3;
+    }
+    
+    .formula-controls {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .score-settings {
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .score-setting-item {
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+    }
+    
+    .score-setting-item label {
+        font-size: 11px;
+        text-align: center;
+    }
+    
+    .score-setting-item input {
+        width: 50px;
+        padding: 3px 4px;
+        font-size: 11px;
+    }
+    
+    .formula-acknowledgment {
+        padding: 5px 8px;
+    }
+    
+    .formula-acknowledgment p {
+        font-size: 10px;
+        line-height: 1.2;
+    }
+    
+    /* 主内容区域移动端优化 */
+    .main-content {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .left-panel,
+    .right-panel {
+        width: 100%;
+        margin-bottom: 0;
+    }
+    
+    /* 显示移动端角色模板入口 */
+    .mobile-template-entry {
+        display: block !important;
+    }
+    
+    /* 表格区域移动端优化 */
+    .table-section {
+        padding: 8px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .entries-table {
+        min-width: 500px;
+        font-size: 11px;
+    }
+    
+    .entries-table th,
+    .entries-table td {
+        padding: 4px 6px;
+        font-size: 10px;
+        white-space: nowrap;
+    }
+    
+    .entries-table th:first-child,
+    .entries-table td:first-child {
+        min-width: 60px;
+    }
+    
+    .entries-table th:nth-child(2),
+    .entries-table td:nth-child(2) {
+        min-width: 80px;
+    }
+    
+    .entries-table th:nth-child(3),
+    .entries-table td:nth-child(3) {
+        min-width: 60px;
+    }
+    
+    .entries-table th:nth-child(4),
+    .entries-table td:nth-child(4) {
+        min-width: 50px;
+    }
+    
+    .entries-table th:nth-child(5),
+    .entries-table td:nth-child(5) {
+        min-width: 50px;
+    }
+    
+    .table-select,
+    .table-input {
+        padding: 3px 4px;
+        font-size: 10px;
+        min-width: 40px;
+    }
+    
+    /* 总分数移动端优化 */
+    .total-score {
+        padding: 8px 10px;
+        margin-top: 8px;
+    }
+    
+    .total-score h3 {
+        font-size: 1em;
+        margin: 0;
+    }
+    
+    /* 右侧面板移动端优化 */
+    .right-panel {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    .template-section {
+        padding: 8px;
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    .template-section h3 {
+        font-size: 1em;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+    
+    .template-selector {
+        margin-bottom: 8px;
+    }
+    
+    .template-selector label {
+        font-size: 12px;
+        display: block;
+        margin-bottom: 4px;
+        text-align: center;
+    }
+    
+    .template-selector select {
+        width: 100%;
+        padding: 6px 8px;
+        font-size: 12px;
+    }
+    
+    .template-tabs {
+        gap: 5px;
+        margin-bottom: 8px;
+    }
+    
+    .tab-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+        flex: 1;
+    }
+    
+    .template-content {
+        padding: 8px;
+        font-size: 11px;
+        overflow-y: auto;
+    }
+    
+    .template-actions {
+        gap: 8px;
+        margin-top: 8px;
+    }
+    
+    .apply-btn,
+    .clear-btn {
+        padding: 8px 12px;
+        font-size: 11px;
+        flex: 1;
+    }
+    
+    /* 机器人提示移动端优化 */
+    .bot-tip {
+        padding: 8px 10px;
+        margin-top: 8px;
+    }
+    
+    .bot-tip p {
+        font-size: 11px;
+        line-height: 1.3;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 3px;
+    }
+    
+    header {
+        padding: 8px;
+    }
+    
+    header h1 {
+        font-size: 1.1em;
+    }
+    
+    header h1 img {
+        width: 30px !important;
+        height: 30px !important;
+    }
+    
+    .formula-box {
+        padding: 6px 8px;
+    }
+    
+    .formula {
+        font-size: 10px;
+        padding: 5px 6px;
+    }
+    
+    .score-settings {
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .score-setting-item {
+        width: 100%;
+        max-width: 150px;
+    }
+    
+    .table-section {
+        padding: 6px;
+    }
+    
+    .entries-table {
+        min-width: 450px;
+    }
+    
+    .entries-table th,
+    .entries-table td {
+        padding: 3px 4px;
+        font-size: 9px;
+    }
+    
+    .template-section {
+        padding: 6px;
+    }
+    
+    .template-content {
+        font-size: 10px;
+    }
+}
+
+/* 水平滚动提示 */
+.table-section::after {
+    content: "👈 左右滑动查看更多";
+    display: none;
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    font-size: 10px;
+    color: #999;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .table-section {
+        position: relative;
+    }
+    
+    .table-section::after {
+        display: block;
+    }
+    
+    .table-section::-webkit-scrollbar {
+        height: 4px;
+    }
+    
+    .table-section::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 2px;
+    }
+    
+    .table-section::-webkit-scrollbar-thumb {
+        background: #667eea;
+        border-radius: 2px;
+    }
+}
+
+/* 移动端触摸优化 */
+@media (max-width: 768px) {
+    /* 增大触摸目标 */
+    .table-select,
+    .table-input,
+    .tab-btn,
+    .apply-btn,
+    .clear-btn,
+    button,
+    select {
+        min-height: 32px;
+        touch-action: manipulation;
+    }
+    
+    /* 触摸反馈 */
+    .tab-btn:active,
+    .apply-btn:active,
+    .clear-btn:active,
+    button:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+    }
+    
+    /* 防止双击缩放 */
+    input,
+    select,
+    button {
+        touch-action: manipulation;
+    }
+    
+    /* 优化选择框在移动端的显示 */
+    .template-selector select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 16px;
+        padding-right: 32px;
+    }
+    
+    /* 表格滚动区域优化 */
+    .table-section {
+        border-radius: 8px;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+    }
+    
+    /* 滚动指示器 */
+    .table-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 20px;
+        background: linear-gradient(to left, rgba(255,255,255,0.8), transparent);
+        pointer-events: none;
+        z-index: 1;
+    }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 360px) {
+    .container {
+        padding: 2px;
+    }
+    
+    header h1 {
+        font-size: 1em;
+        word-break: break-word;
+    }
+    
+    .formula {
+        font-size: 9px;
+        padding: 4px 5px;
+    }
+    
+    .entries-table {
+        min-width: 400px;
+    }
+    
+    .entries-table th,
+    .entries-table td {
+        padding: 2px 3px;
+        font-size: 8px;
+    }
+    
+    .score-setting-item input {
+        width: 45px;
+        padding: 2px 3px;
+        font-size: 10px;
+    }
+}
+
+/* 横屏模式优化 - 仅在较大屏幕的横屏模式下应用 */
+@media (min-width: 769px) and (orientation: landscape) {
+    .container {
+        padding: 3px;
+    }
+    
+    header {
+        padding: 5px;
+    }
+    
+    header h1 {
+        font-size: 1.1em;
+        margin-bottom: 2px;
+    }
+    
+    header p {
+        font-size: 11px;
+    }
+    
+    .formula-box {
+        padding: 6px 8px;
+    }
+}
+
+/* 移动端强制垂直布局 - 确保在所有移动端情况下都生效 */
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+    
+    .left-panel,
+    .right-panel {
+        width: 100% !important;
+        flex: none !important;
+        min-width: auto !important;
+        margin-bottom: 0 !important;
+    }
+    
+    /* 确保角色模板区域显示 */
+    .right-panel {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        order: 2; /* 确保在表格后面显示 */
+    }
+    
+    .template-section {
+        display: block !important;
+        visibility: visible !important;
+        height: auto !important;
+        min-height: 200px;
+    }
+    
+    .template-content {
+        max-height: 300px !important;
+        overflow-y: auto;
+    }
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* 页面加载动画 */
+.container {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.table-section,
+.template-section {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* 移动端专用样式增强 */
+@media (max-width: 768px) {
+    /* 优化焦点状态 */
+    .table-input:focus,
+    .table-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        outline: none;
+    }
+    
+    /* 优化按钮状态 */
+    .tab-btn.active {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+    
+    /* 表格行悬停效果（仅在非触摸设备上） */
+    @media (hover: hover) {
+        .entries-table tbody tr:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+    }
+    
+    /* 滚动条在移动端的优化 */
+    .table-section::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .template-content::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .template-content::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 2px;
+    }
+    
+    .template-content::-webkit-scrollbar-thumb {
+        background: #667eea;
+        border-radius: 2px;
+    }
+}
+
+/* 可访问性增强 */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+    .formula,
+    .total-score,
+    .bot-tip {
+        border: 2px solid currentColor;
+    }
+    
+    .table-input:focus,
+    .table-select:focus {
+        border-width: 3px;
+    }
+}
+
+/* 深色模式基础支持 */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        color: #e0e0e0;
+    }
+    
+    .container {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .formula-section,
+    .table-section,
+    .template-section {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .entries-table th {
+        background: rgba(255, 255, 255, 0.1);
+        color: #e0e0e0;
+    }
+    
+    .table-input,
+    .table-select {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: #e0e0e0;
+    }
+}
+
+/* 通用滚动条样式 */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #5a67d8;
+}
+
+::-webkit-scrollbar-corner {
+    background: #f1f1f1;
+}
+
+/* 公式框内的鸣谢信息样式 */
+.formula-acknowledgment {
+    padding: 6px 10px;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 4px;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.formula-acknowledgment p {
+    margin: 0;
+    color: #666;
+    font-size: 11px;
+    line-height: 1.3;
+}
+
+.formula-acknowledgment a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.formula-acknowledgment a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}

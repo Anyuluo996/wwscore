@@ -444,9 +444,10 @@ header p {
     backdrop-filter: blur(10px);
     padding: 15px;
     margin-bottom: 10px;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
+    max-height: 500px; /* 设置最大高度 */
+    overflow: hidden;
 }
 
 .entries-table {
@@ -457,6 +458,46 @@ header p {
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     flex: 1;
+    display: block; /* 改为block以支持滚动 */
+}
+
+.entries-table thead {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.entries-table tbody {
+    display: block;
+    max-height: 350px; /* 设置表格主体最大高度 */
+    overflow-y: auto; /* 启用垂直滚动 */
+    width: 100%;
+}
+
+/* 美化表格滚动条 */
+.entries-table tbody::-webkit-scrollbar {
+    width: 6px;
+}
+
+.entries-table tbody::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.entries-table tbody::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 3px;
+    transition: background 0.3s ease;
+}
+
+.entries-table tbody::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #5a6fd8, #6a4190);
+}
+
+.entries-table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
 }
 
 .entries-table th,
@@ -488,6 +529,14 @@ header p {
     font-weight: 600;
     color: #333;
     font-size: 12px;
+}
+
+.entry-position .short-text {
+    display: none;
+}
+
+.entry-position .full-text {
+    display: inline;
 }
 
 .entry-position.main {
@@ -1160,11 +1209,21 @@ header p {
         padding: 8px;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        max-height: 400px; /* 移动端设置较小的最大高度 */
     }
     
     .entries-table {
         min-width: 500px;
         font-size: 11px;
+    }
+    
+    .entries-table tbody {
+        max-height: 300px; /* 移动端表格主体高度 */
+    }
+    
+    /* 移动端滚动条优化 */
+    .entries-table tbody::-webkit-scrollbar {
+        width: 4px;
     }
     
     .entries-table th,
@@ -1176,7 +1235,32 @@ header p {
     
     .entries-table th:first-child,
     .entries-table td:first-child {
-        min-width: 60px;
+        min-width: 85px;
+        width: 85px;
+    }
+    
+    /* 在移动端优化表头文字 */
+    .entries-table th:first-child::after {
+        content: "位置";
+    }
+    
+    .entries-table th:first-child {
+        font-size: 0;
+    }
+    
+    /* 在超小屏幕上进一步优化词条位置显示 */
+    .entry-position {
+        font-size: 8px;
+        line-height: 1.2;
+    }
+    
+    /* 在移动端显示简洁版本的词条位置文字 */
+    .entry-position .full-text {
+        display: none;
+    }
+    
+    .entry-position .short-text {
+        display: inline;
     }
     
     .entries-table th:nth-child(2),

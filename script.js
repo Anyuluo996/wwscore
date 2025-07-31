@@ -147,10 +147,16 @@ function createTableRow(id, title, type) {
         attributeOptions = subAttributeTypes;
     }
     
+    // 创建简洁版本的标题（用于小屏幕）
+    const shortTitle = title.replace('主词条', '主').replace('副词条', '副');
+    
     const row = document.createElement('tr');
     row.innerHTML = `
         <td>
-            <span class="entry-position ${type}">${title}</span>
+            <span class="entry-position ${type}">
+                <span class="full-text">${title}</span>
+                <span class="short-text">${shortTitle}</span>
+            </span>
         </td>
         <td>
             <select id="${id}-attribute" class="table-select" onchange="handleAttributeChange('${id}')">

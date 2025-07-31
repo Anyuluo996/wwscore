@@ -71,6 +71,7 @@ wwscore/
 ├── index.html              # 主页面
 ├── script.js               # 核心JavaScript逻辑
 ├── style.css               # 样式文件
+├── config.js               # 配置文件（角色列表等）
 ├── character/              # 角色配置目录
 │   ├── 角色名/
 │   │   └── calc.json       # 角色配置文件

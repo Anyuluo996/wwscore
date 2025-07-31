@@ -383,7 +383,7 @@ async function initCharacterTemplates() {
         }
         
         // 获取角色列表
-        const characters = await getCharacterList();
+        const characters = getCharacterList();
         populateCharacterSelect(characters);
         initTemplateEvents();
         
@@ -396,18 +396,15 @@ async function initCharacterTemplates() {
     }
 }
 
-async function getCharacterList() {
-    // 这里我们需要从character目录获取角色列表
-    // 由于浏览器限制，我们无法直接读取文件系统
-    // 所以我们需要预定义角色列表或通过其他方式获取
-    const characters = [
-        '安可', '白芷', '布兰特', '长离', '炽霞', '椿', '弗洛洛', '忌炎', '今汐', 
-        '卡卡罗', '卡提希娅', '坎特蕾拉', '珂莱塔', '灯灯', '露帕', '洛可可', 
-        '漂泊者·气动', '漂泊者·湮灭', '漂泊者·衍射', '桃祈', '维里奈', '相里要', 
-        '夏空', '秧秧', '吟霖', '渊武', '赞妮', '折枝', '鉴心', '散华', '釉瑚', '莫特斐',
-        '丹瑾', '凌阳', '守岸人', '测试', '秋水', '菲比'
-    ];
-    return characters;
+function getCharacterList() {
+    // 从配置文件中获取角色列表
+    if (typeof CharacterConfig !== 'undefined' && CharacterConfig.getCharacterList) {
+        return CharacterConfig.getCharacterList();
+    }
+    
+    // 如果配置文件未加载，返回空数组并显示错误
+    console.error('角色配置文件未加载，请检查 config.js 文件');
+    return [];
 }
 
 function populateCharacterSelect(characters) {

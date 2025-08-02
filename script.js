@@ -937,6 +937,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // OCR功能相关变量
 let currentImageFile = null;
 let ocrResults = [];
+let ocrHistory = [];
 
 // 初始化OCR功能
 function initOCR() {
@@ -1013,6 +1014,12 @@ function initOCR() {
     
     // 应用识别结果
     applyResultsBtn.addEventListener('click', applyOCRResults);
+    
+    // 初始化标签页切换
+    initOCRTabs();
+    
+    // 初始化历史记录功能
+    initOCRHistory();
     
     console.log('OCR功能初始化完成');
 }
@@ -1258,31 +1265,31 @@ function parseOCRText(text) {
     // 词条属性匹配模式
     const patterns = [
         // 攻击相关
-        { regex: /攻击\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '攻击百分比', isPercent: true },
-        { regex: /攻击\s*[+]?\s*(\d+\.?\d*)/i, attribute: '攻击', isPercent: false },
+        { regex: /攻击\s*[+]?\s*(\d+\.?\d*)%/i, attribute: '攻击百分比', attributeKey: 'atk_percent', isPercent: true },
+        { regex: /攻击\s*[+]?\s*(\d+\.?\d*)/i, attribute: '攻击', attributeKey: 'atk', isPercent: false },
         
         // 生命相关
-        { regex: /生命\s*[+]?\s*(\d+\.?\d*)%/i, attribute: '生命百分比', isPercent: true },
-        { regex: /生命\s*[+]?\s*(\d+\.?\d*)/i, attribute: '生命', isPercent: false },
+        { regex: /生命\s*[+]?\s*(\d+\.?\d*)%/i, attribute: '生命百分比', attributeKey: 'hp_percent', isPercent: true },
+        { regex: /生命\s*[+]?\s*(\d+\.?\d*)/i, attribute: '生命', attributeKey: 'hp', isPercent: false },
         
         // 防御相关
-        { regex: /防御\s*[+]?\s*(\d+\.?\d*)%/i, attribute: '防御百分比', isPercent: true },
-        { regex: /防御\s*[+]?\s*(\d+\.?\d*)/i, attribute: '防御', isPercent: false },
+        { regex: /防御\s*[+]?\s*(\d+\.?\d*)%/i, attribute: '防御百分比', attributeKey: 'def_percent', isPercent: true },
+        { regex: /防御\s*[+]?\s*(\d+\.?\d*)/i, attribute: '防御', attributeKey: 'def', isPercent: false },
         
         // 暴击相关
-        { regex: /暴击率?\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '暴击', isPercent: true },
-        { regex: /暴击伤害\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '暴击伤害', isPercent: true },
+        { regex: /暴击率?\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '暴击', attributeKey: 'crit_rate', isPercent: true },
+        { regex: /暴击伤害\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '暴击伤害', attributeKey: 'crit_damage', isPercent: true },
         
         // 特殊属性
-        { regex: /共鸣效率\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '共鸣效率', isPercent: true },
-        { regex: /属性伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '属性伤害加成', isPercent: true },
-        { regex: /治疗效果加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '治疗效果加成', isPercent: true },
+        { regex: /共鸣效率\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '共鸣效率', attributeKey: 'resonance_efficiency', isPercent: true },
+        { regex: /属性伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '属性伤害加成', attributeKey: 'element_damage', isPercent: true },
+        { regex: /治疗效果加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '治疗效果加成', attributeKey: 'healing_bonus', isPercent: true },
         
         // 技能伤害
-        { regex: /普攻伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '普攻伤害加成', isPercent: true },
-        { regex: /重击伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '重击伤害加成', isPercent: true },
-        { regex: /共鸣技能伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '共鸣技能伤害加成', isPercent: true },
-        { regex: /共鸣解放伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '共鸣解放伤害加成', isPercent: true }
+        { regex: /普攻伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '普攻伤害加成', attributeKey: 'basic_attack_damage', isPercent: true },
+        { regex: /重击伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '重击伤害加成', attributeKey: 'heavy_attack_damage', isPercent: true },
+        { regex: /共鸣技能伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '共鸣技能伤害加成', attributeKey: 'resonance_skill_damage', isPercent: true },
+        { regex: /共鸣解放伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '共鸣解放伤害加成', attributeKey: 'resonance_liberation_damage', isPercent: true }
     ];
     
     // 遍历每一行文本
@@ -1294,6 +1301,7 @@ function parseOCRText(text) {
                 if (!isNaN(value) && value > 0) {
                     results.push({
                         attribute: pattern.attribute,
+                        attributeKey: pattern.attributeKey,
                         value: value.toString(),
                         confidence: 0.8 // 默认置信度
                     });
@@ -1422,6 +1430,9 @@ function applyOCRResults() {
     });
 
     if (appliedCount > 0) {
+        // 保存到历史记录
+        saveOCRHistory(ocrResults);
+        
         alert(`成功按顺序应用了 ${appliedCount} 个词条！`);
         calculateTotal();
         
@@ -1513,4 +1524,248 @@ function resetOCRModal() {
     if (fileInput) fileInput.value = '';
     if (resultContent) resultContent.innerHTML = '';
     if (uploadArea) uploadArea.classList.remove('dragover');
+}
+
+// 初始化OCR标签页切换
+function initOCRTabs() {
+    const tabBtns = document.querySelectorAll('.ocr-tab-btn');
+    const tabContents = document.querySelectorAll('.ocr-tab-content');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetTab = btn.getAttribute('data-tab');
+            console.log('切换到标签页:', targetTab);
+            
+            // 移除所有活动状态
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => {
+                c.classList.remove('active');
+                console.log('移除活动状态:', c.id);
+            });
+            
+            // 添加当前活动状态
+            btn.classList.add('active');
+            const targetContent = document.getElementById(targetTab + 'Tab');
+            if (targetContent) {
+                targetContent.classList.add('active');
+                console.log('激活标签页:', targetContent.id);
+                console.log('标签页显示状态:', window.getComputedStyle(targetContent).display);
+                
+                // 如果切换到历史记录标签页，刷新历史记录显示
+                if (targetTab === 'history') {
+                    console.log('切换到历史记录标签页，开始显示历史记录');
+                    displayOCRHistory();
+                }
+            }
+        });
+    });
+}
+
+// 初始化OCR历史记录功能
+function initOCRHistory() {
+    // 从localStorage加载历史记录
+    loadOCRHistory();
+    
+    // 初始显示历史记录（如果当前在历史记录标签页）
+    const historyTab = document.getElementById('historyTab');
+    if (historyTab && historyTab.classList.contains('active')) {
+        displayOCRHistory();
+    }
+    
+    // 绑定清空历史记录按钮事件
+    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+    if (clearHistoryBtn) {
+        clearHistoryBtn.addEventListener('click', () => {
+            if (confirm('确定要清空所有OCR历史记录吗？')) {
+                clearOCRHistory();
+            }
+        });
+    }
+}
+
+// 保存OCR历史记录
+function saveOCRHistory(results) {
+    console.log('准备保存OCR历史记录:', results);
+    
+    if (!results || results.length === 0) {
+        console.log('没有结果需要保存');
+        return;
+    }
+    
+    const historyItem = {
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        results: results.map(result => ({
+            attribute: result.attribute,
+            attributeKey: result.attributeKey,
+            value: result.value,
+            confidence: result.confidence || 0
+        }))
+    };
+    
+    console.log('创建的历史记录项:', historyItem);
+    
+    // 添加到历史记录数组开头
+    ocrHistory.unshift(historyItem);
+    
+    // 限制历史记录数量（最多保存50条）
+    if (ocrHistory.length > 50) {
+        ocrHistory = ocrHistory.slice(0, 50);
+    }
+    
+    console.log('当前历史记录数量:', ocrHistory.length);
+    
+    // 保存到localStorage
+    try {
+        localStorage.setItem('ocrHistory', JSON.stringify(ocrHistory));
+        console.log('OCR历史记录已保存到localStorage');
+    } catch (error) {
+        console.error('保存OCR历史记录失败:', error);
+    }
+}
+
+// 从localStorage加载OCR历史记录
+function loadOCRHistory() {
+    try {
+        const savedHistory = localStorage.getItem('ocrHistory');
+        if (savedHistory) {
+            ocrHistory = JSON.parse(savedHistory);
+            console.log(`已加载 ${ocrHistory.length} 条OCR历史记录`);
+        }
+    } catch (error) {
+        console.error('加载OCR历史记录失败:', error);
+        ocrHistory = [];
+    }
+}
+
+// 显示OCR历史记录
+function displayOCRHistory() {
+    console.log('显示OCR历史记录，当前记录数量:', ocrHistory.length);
+    
+    const historyContent = document.getElementById('historyContent');
+    
+    if (!historyContent) {
+        console.error('找不到historyContent元素');
+        return;
+    }
+    
+    // 清空现有内容
+    historyContent.innerHTML = '';
+    
+    if (ocrHistory.length === 0) {
+        console.log('历史记录为空，显示空状态');
+        // 显示空状态
+        historyContent.innerHTML = `
+            <div class="history-empty">
+                <div class="empty-icon">📝</div>
+                <p>暂无OCR历史记录</p>
+                <p class="empty-hint">完成OCR识别后，记录将显示在这里</p>
+            </div>
+        `;
+        return;
+    }
+    
+    console.log('开始显示历史记录项');
+    // 显示历史记录
+    ocrHistory.forEach((item, index) => {
+        console.log(`创建历史记录项 ${index + 1}:`, item);
+        const historyItem = createHistoryItemElement(item);
+        console.log(`添加历史记录项 ${index + 1} 到DOM:`, historyItem);
+        historyContent.appendChild(historyItem);
+        console.log(`historyContent当前子元素数量:`, historyContent.children.length);
+    });
+}
+
+// 创建历史记录项元素
+function createHistoryItemElement(item) {
+    console.log('创建历史记录项元素，item:', item);
+    const historyItem = document.createElement('div');
+    historyItem.className = 'history-item';
+    console.log('创建的DOM元素:', historyItem);
+    
+    const timestamp = new Date(item.timestamp);
+    const timeString = timestamp.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    historyItem.innerHTML = `
+        <div class="history-item-header">
+            <div>
+                <span class="history-item-time">${timeString}</span>
+                <span class="history-item-count">${item.results.length} 个词条</span>
+            </div>
+            <div class="history-item-actions">
+                <button class="history-apply-btn" onclick="applyHistoryItem(${item.id})">应用</button>
+                <button class="history-delete-btn" onclick="deleteHistoryItem(${item.id})">删除</button>
+            </div>
+        </div>
+        <div class="history-item-content">
+            <div class="history-results">
+                ${item.results.map(result => `
+                    <div class="history-result-item">
+                        <div class="history-result-label">${result.attribute}</div>
+                        <div class="history-result-value">${result.value}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    return historyItem;
+}
+
+// 应用历史记录项
+function applyHistoryItem(itemId) {
+    const historyItem = ocrHistory.find(item => item.id === itemId);
+    if (!historyItem) {
+        alert('历史记录不存在');
+        return;
+    }
+    
+    // 设置当前OCR结果为历史记录的结果
+    ocrResults = historyItem.results;
+    
+    // 应用到表格
+    applyOCRResults();
+}
+
+// 删除历史记录项
+function deleteHistoryItem(itemId) {
+    if (!confirm('确定要删除这条历史记录吗？')) {
+        return;
+    }
+    
+    // 从数组中移除
+    ocrHistory = ocrHistory.filter(item => item.id !== itemId);
+    
+    // 更新localStorage
+    try {
+        localStorage.setItem('ocrHistory', JSON.stringify(ocrHistory));
+        console.log('历史记录已删除');
+    } catch (error) {
+        console.error('删除历史记录失败:', error);
+    }
+    
+    // 刷新显示
+    displayOCRHistory();
+}
+
+// 清空所有OCR历史记录
+function clearOCRHistory() {
+    ocrHistory = [];
+    
+    // 清空localStorage
+    try {
+        localStorage.removeItem('ocrHistory');
+        console.log('所有OCR历史记录已清空');
+    } catch (error) {
+        console.error('清空历史记录失败:', error);
+    }
+    
+    // 刷新显示
+    displayOCRHistory();
 }

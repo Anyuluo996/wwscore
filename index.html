@@ -170,7 +170,13 @@
                 <h3>📷 OCR图片识别</h3>
                 <button class="ocr-modal-close" id="closeOcrModal">×</button>
             </div>
+            <div class="ocr-modal-tabs">
+                <button class="ocr-tab-btn active" data-tab="upload">📷 图片识别</button>
+                <button class="ocr-tab-btn" data-tab="history">📋 历史记录</button>
+            </div>
             <div class="ocr-modal-body">
+                <!-- 图片识别标签页 -->
+                <div class="ocr-tab-content active" id="uploadTab">
                 <div class="upload-area" id="uploadArea">
                     <div class="upload-content">
                         <div class="upload-icon">📁</div>
@@ -208,14 +214,25 @@
                     <div class="loading-spinner"></div>
                     <p>正在识别中，请稍候...</p>
                 </div>
+                </div>
+                
+                <!-- 历史记录标签页 -->
+                <div class="ocr-tab-content" id="historyTab">
+                    <div class="history-header">
+                        <h4>📋 OCR历史记录</h4>
+                        <div class="history-actions">
+                            <button class="history-clear-btn" id="clearHistoryBtn">清空历史</button>
+                        </div>
+                    </div>
+                    <div class="history-content" id="historyContent">
+                        <!-- 历史记录内容将由JavaScript动态生成 -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="config.js"></script>
-
-    <!-- Tesseract.js for client-side OCR -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

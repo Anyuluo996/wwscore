@@ -664,101 +664,50 @@ function applyTemplate() {
         }
     }
     
-    // 清空所有表格内容
-    clearAllSelections();
+    // 只清空权重，保留属性选择和数值
+    clearAttributesAndWeights();
     
-    // 收集所有主词条并按类型分类（包括权重为0的）
-    const mainPropsForSlot1 = []; // 主词条1的属性
-    const mainPropsForSlot2 = []; // 主词条2的属性
-    
-    Object.entries(mainProps).forEach(([prop, weight]) => {
-        // 处理所有权重的词条，包括权重为0的
-        const attributeKey = findAttributeKey(prop, 'main');
-        if (attributeKey) {
-            // 检查属性属于哪个主词条类型
-            if (mainAttributeTypes1[attributeKey]) {
-                mainPropsForSlot1.push({ prop, weight, attributeKey });
-            } else if (mainAttributeTypes2[attributeKey]) {
-                mainPropsForSlot2.push({ prop, weight, attributeKey });
-            } else {
-                console.warn(`主词条属性不在任何类型中: ${prop} -> ${attributeKey}`);
+    // 应用主词条权重（根据已有属性设置权重）
+    for (let i = 1; i <= 2; i++) {
+        const attributeSelect = document.getElementById(`main-${i}-attribute`);
+        const weightInput = document.getElementById(`main-${i}-weight`);
+        
+        if (attributeSelect && weightInput && attributeSelect.value) {
+            // 根据当前选择的属性查找模板中的权重
+            const templateWeight = getTemplateWeightForAttribute(attributeSelect.value, 'main');
+            if (templateWeight !== null) {
+                weightInput.value = templateWeight.toString();
+                console.log(`主词条${i}权重设置: ${attributeSelect.value} = ${templateWeight}`);
             }
-        } else {
-            console.warn(`主词条属性映射失败: ${prop}`);
-        }
-    });
-    
-    // 应用主词条1权重（优先选择权重最高的，如果都是0则选择第一个）
-    if (mainPropsForSlot1.length > 0) {
-        const sortedProps = mainPropsForSlot1.sort((a, b) => b.weight - a.weight);
-        const topProp = sortedProps[0];
-        const attributeSelect = document.getElementById('main-1-attribute');
-        const weightInput = document.getElementById('main-1-weight');
-        
-        if (attributeSelect && weightInput) {
-            attributeSelect.value = topProp.attributeKey;
-            weightInput.value = topProp.weight;
             
             // 触发change事件以更新显示
             attributeSelect.dispatchEvent(new Event('change'));
         }
     }
     
-    // 应用主词条2权重（优先选择权重最高的，如果都是0则选择第一个）
-    if (mainPropsForSlot2.length > 0) {
-        const sortedProps = mainPropsForSlot2.sort((a, b) => b.weight - a.weight);
-        const topProp = sortedProps[0];
-        const attributeSelect = document.getElementById('main-2-attribute');
-        const weightInput = document.getElementById('main-2-weight');
+    // 应用副词条权重（根据已有属性设置权重）
+    for (let i = 1; i <= 5; i++) {
+        const attributeSelect = document.getElementById(`sub-${i}-attribute`);
+        const weightInput = document.getElementById(`sub-${i}-weight`);
         
-        if (attributeSelect && weightInput) {
-            attributeSelect.value = topProp.attributeKey;
-            weightInput.value = topProp.weight;
-            
-            // 触发change事件以更新显示
-            attributeSelect.dispatchEvent(new Event('change'));
-        }
-    }
-    
-    // 收集所有副词条（包括权重为0的）
-    const subPropsWithWeight = [];
-    if (currentCharacterTemplate.sub_props) {
-        Object.entries(currentCharacterTemplate.sub_props).forEach(([prop, weight]) => {
-            // 处理所有权重的词条，包括权重为0的
-            const attributeKey = findAttributeKey(prop, 'sub');
-            if (attributeKey) {
-                subPropsWithWeight.push({ prop, weight, attributeKey });
-            } else {
-                console.warn(`副词条属性映射失败: ${prop}`);
+        if (attributeSelect && weightInput && attributeSelect.value) {
+            // 根据当前选择的属性查找模板中的权重
+            const templateWeight = getTemplateWeightForAttribute(attributeSelect.value, 'sub');
+            if (templateWeight !== null) {
+                weightInput.value = templateWeight.toString();
+                console.log(`副词条${i}权重设置: ${attributeSelect.value} = ${templateWeight}`);
             }
-        });
-    }
-    
-    // 按权重排序副词条（权重高的优先，权重为0的排在后面）
-    subPropsWithWeight.sort((a, b) => b.weight - a.weight);
-    
-    // 应用副词条权重到表格（最多5行）
-    subPropsWithWeight.slice(0, 5).forEach((item, index) => {
-        const subIndex = index + 1;
-        const attributeSelect = document.getElementById(`sub-${subIndex}-attribute`);
-        const weightInput = document.getElementById(`sub-${subIndex}-weight`);
-        
-        if (attributeSelect && weightInput) {
-            attributeSelect.value = item.attributeKey;
-            weightInput.value = item.weight;
             
             // 触发change事件以更新显示
             attributeSelect.dispatchEvent(new Event('change'));
         }
-    });
+    }
     
     // 重新计算总分
     calculateTotal();
     
     // 静默应用，不显示弹窗
-    const appliedMain = mainPropsForSlot1.length + mainPropsForSlot2.length;
-    const appliedSub = subPropsWithWeight.length;
-    console.log(`模板应用成功！主词条: ${appliedMain}个（主词条1: ${mainPropsForSlot1.length}个，主词条2: ${mainPropsForSlot2.length}个），副词条: ${appliedSub}个`);
+    console.log('模板应用成功！已根据现有属性设置权重');
 }
 
 // 辅助函数：根据中文名称查找属性键
@@ -821,6 +770,28 @@ function findAttributeKey(chineseName, type) {
 function clearTemplate() {
     clearAllSelections();
     console.log('已清除所有选择');
+}
+
+function clearAttributesAndWeights() {
+    // 只清空主词条和副词条的权重，保留属性选择和数值
+    for (let i = 1; i <= 2; i++) {
+        const weightInput = document.getElementById(`main-${i}-weight`);
+        const resultSpan = document.getElementById(`main-${i}-result`);
+        
+        if (weightInput) weightInput.value = '';
+        if (resultSpan) resultSpan.textContent = '0.00';
+    }
+    
+    // 只清空副词条的权重，保留属性选择和数值
+    for (let i = 1; i <= 5; i++) {
+        const weightInput = document.getElementById(`sub-${i}-weight`);
+        const resultSpan = document.getElementById(`sub-${i}-result`);
+        
+        if (weightInput) weightInput.value = '';
+        if (resultSpan) resultSpan.textContent = '0.00';
+    }
+    
+    calculateTotal();
 }
 
 function clearAllSelections() {
@@ -958,4 +929,588 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     initApp();
+    
+    // 初始化OCR功能
+    initOCR();
 });
+
+// OCR功能相关变量
+let currentImageFile = null;
+let ocrResults = [];
+
+// 初始化OCR功能
+function initOCR() {
+    console.log('开始初始化OCR功能...');
+    
+    // 获取OCR相关DOM元素
+    const ocrBtn = document.getElementById('ocrBtn');
+    const ocrModal = document.getElementById('ocrModal');
+    const closeOcrModal = document.getElementById('closeOcrModal');
+    const fileInput = document.getElementById('fileInput');
+    const uploadArea = document.getElementById('uploadArea');
+    const previewArea = document.getElementById('previewArea');
+    const previewImg = document.getElementById('previewImg');
+    const startOcrBtn = document.getElementById('startOcrBtn');
+    const ocrLoading = document.getElementById('ocrLoading');
+    const ocrResult = document.getElementById('ocrResult');
+    const resultContent = document.getElementById('resultContent');
+    const applyResultsBtn = document.getElementById('applyResultsBtn');
+    
+    if (!ocrBtn || !ocrModal) {
+        console.log('OCR相关DOM元素未找到，跳过OCR功能初始化');
+        return;
+    }
+    
+    // 打开OCR弹窗
+    ocrBtn.addEventListener('click', () => {
+        ocrModal.style.display = 'flex';
+        resetOCRModal();
+    });
+    
+    // 关闭OCR弹窗
+    closeOcrModal.addEventListener('click', () => {
+        ocrModal.style.display = 'none';
+        resetOCRModal();
+    });
+    
+    // 点击弹窗背景关闭
+    ocrModal.addEventListener('click', (e) => {
+        if (e.target === ocrModal) {
+            ocrModal.style.display = 'none';
+            resetOCRModal();
+        }
+    });
+    
+    // 文件选择
+    fileInput.addEventListener('change', handleFileSelect);
+    
+    // 拖拽上传
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFile(files[0]);
+        }
+    });
+    
+    // 点击上传区域选择文件
+    uploadArea.addEventListener('click', () => {
+        fileInput.click();
+    });
+    
+    // 开始OCR识别
+    startOcrBtn.addEventListener('click', performOCR);
+    
+    // 应用识别结果
+    applyResultsBtn.addEventListener('click', applyOCRResults);
+    
+    console.log('OCR功能初始化完成');
+}
+
+// 处理文件选择
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (file) {
+        handleFile(file);
+    }
+}
+
+// 处理文件
+function handleFile(file) {
+    // 检查文件类型
+    if (!file.type.startsWith('image/')) {
+        alert('请选择图片文件');
+        return;
+    }
+    
+    // 检查文件大小（限制为5MB）
+    if (file.size > 5 * 1024 * 1024) {
+        alert('图片文件大小不能超过5MB');
+        return;
+    }
+    
+    currentImageFile = file;
+    
+    // 显示预览
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const previewImg = document.getElementById('previewImg');
+        const uploadArea = document.getElementById('uploadArea');
+        const previewArea = document.getElementById('previewArea');
+        
+        previewImg.src = e.target.result;
+        uploadArea.style.display = 'none';
+        previewArea.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+}
+
+// 执行OCR识别
+async function performOCR() {
+    if (!currentImageFile) {
+        alert('请先选择图片');
+        return;
+    }
+    
+    const ocrLoading = document.getElementById('ocrLoading');
+    const ocrResult = document.getElementById('ocrResult');
+    const startOcrBtn = document.getElementById('startOcrBtn');
+    
+    try {
+        // 显示加载状态
+        ocrLoading.style.display = 'block';
+        ocrResult.style.display = 'none';
+        startOcrBtn.disabled = true;
+        
+        // 只使用百度OCR
+        const results = await baiduOCR(currentImageFile);
+        
+        if (results && results.length > 0) {
+            displayOCRResults(results);
+            ocrResult.style.display = 'block';
+        } else {
+            alert('未识别到词条信息，请尝试其他图片');
+        }
+        
+    } catch (error) {
+        console.error('OCR识别失败:', error);
+        alert('OCR识别失败: ' + error.message);
+    } finally {
+        ocrLoading.style.display = 'none';
+        startOcrBtn.disabled = false;
+    }
+}
+
+// 百度OCR识别
+async function baiduOCR(imageFile) {
+    try {
+        console.log('开始百度OCR识别...');
+        
+        // 百度OCR已启用
+        
+        // 将图片转换为Base64
+        const imageBase64 = await fileToBase64(imageFile);
+        
+        // 调用本地后端API
+        const response = await fetch('/api/baidu-ocr', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                image: imageBase64
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.error_code) {
+            throw new Error(`百度OCR API错误: ${data.error_msg}`);
+        }
+        
+        if (!data.words_result || data.words_result.length === 0) {
+            console.log('百度OCR未识别到文字内容');
+            return [];
+        }
+        
+        // 解析百度OCR结果
+        return parseBaiduOCRResult(data);
+        
+    } catch (error) {
+        console.error('百度OCR识别失败:', error);
+        throw error;
+    }
+}
+
+
+
+// 将文件转换为base64
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            // 移除data:image/...;base64,前缀
+            const base64 = reader.result.split(',')[1];
+            resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// 解析百度OCR结果
+function parseBaiduOCRResult(ocrData) {
+    console.log('解析百度OCR结果:', ocrData);
+    
+    if (!ocrData.words_result || ocrData.words_result.length === 0) {
+        return [];
+    }
+    
+    const wordsResult = ocrData.words_result;
+    const results = [];
+    
+    // 属性名称映射
+    const attributeMap = {
+        '生命': 'hp',
+        '攻击': 'atk', 
+        '防御': 'def',
+        '暴击': 'crit_rate',
+        '暴击伤害': 'crit_damage',
+        '共鸣效率': 'resonance_efficiency',
+        '普攻伤害加成': 'basic_attack_damage',
+        '重击伤害加成': 'heavy_attack_damage',
+        '共鸣技能伤害加成': 'resonance_skill_damage',
+        '共鸣解放伤害加成': 'resonance_liberation_damage',
+        '属性伤害加成': 'element_damage',
+        '治疗效果加成': 'healing_bonus'
+    };
+    
+    // 遍历识别结果，寻找属性和数值的配对
+    for (let i = 0; i < wordsResult.length; i++) {
+        const currentWord = wordsResult[i].words.trim();
+        
+        // 检查是否是属性名称
+        if (attributeMap[currentWord]) {
+            // 寻找后续的数值
+            for (let j = i + 1; j < Math.min(i + 3, wordsResult.length); j++) {
+                const nextWord = wordsResult[j].words.trim();
+                
+                // 匹配数值（可能包含%号）
+                const valueMatch = nextWord.match(/^(\d+\.?\d*)%?$/);
+                if (valueMatch) {
+                    const value = parseFloat(valueMatch[1]);
+                    const isPercent = nextWord.includes('%');
+                    
+                    if (!isNaN(value) && value > 0) {
+                        // 智能确定属性类型（根据%号区分基础属性和百分比属性）
+                        let attributeType = attributeMap[currentWord];
+                        let displayName = currentWord;
+                        
+                        // 根据是否有%号来区分属性类型
+                        if (currentWord === '攻击') {
+                            if (isPercent) {
+                                attributeType = 'atk_percent';
+                                displayName = '攻击百分比';
+                            } else {
+                                attributeType = 'atk';
+                                displayName = '攻击';
+                            }
+                        } else if (currentWord === '生命') {
+                            if (isPercent) {
+                                attributeType = 'hp_percent';
+                                displayName = '生命百分比';
+                            } else {
+                                attributeType = 'hp';
+                                displayName = '生命';
+                            }
+                        } else if (currentWord === '防御') {
+                            if (isPercent) {
+                                attributeType = 'def_percent';
+                                displayName = '防御百分比';
+                            } else {
+                                attributeType = 'def';
+                                displayName = '防御';
+                            }
+                        } else {
+                            // 其他属性保持原有逻辑
+                            displayName = currentWord;
+                        }
+                        
+                        results.push({
+                            attribute: displayName,
+                            attributeKey: attributeType,
+                            value: value.toString(),
+                            confidence: 0.9
+                        });
+                        
+                        console.log(`识别到词条: ${displayName} = ${value}${isPercent ? '%' : ''}`);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    console.log('解析结果:', results);
+    return results;
+}
+
+// 解析OCR文本结果
+function parseOCRText(text) {
+    const results = [];
+    const lines = text.split('\n').filter(line => line.trim());
+    
+    // 词条属性匹配模式
+    const patterns = [
+        // 攻击相关
+        { regex: /攻击\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '攻击百分比', isPercent: true },
+        { regex: /攻击\s*[+]?\s*(\d+\.?\d*)/i, attribute: '攻击', isPercent: false },
+        
+        // 生命相关
+        { regex: /生命\s*[+]?\s*(\d+\.?\d*)%/i, attribute: '生命百分比', isPercent: true },
+        { regex: /生命\s*[+]?\s*(\d+\.?\d*)/i, attribute: '生命', isPercent: false },
+        
+        // 防御相关
+        { regex: /防御\s*[+]?\s*(\d+\.?\d*)%/i, attribute: '防御百分比', isPercent: true },
+        { regex: /防御\s*[+]?\s*(\d+\.?\d*)/i, attribute: '防御', isPercent: false },
+        
+        // 暴击相关
+        { regex: /暴击率?\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '暴击', isPercent: true },
+        { regex: /暴击伤害\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '暴击伤害', isPercent: true },
+        
+        // 特殊属性
+        { regex: /共鸣效率\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '共鸣效率', isPercent: true },
+        { regex: /属性伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '属性伤害加成', isPercent: true },
+        { regex: /治疗效果加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '治疗效果加成', isPercent: true },
+        
+        // 技能伤害
+        { regex: /普攻伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '普攻伤害加成', isPercent: true },
+        { regex: /重击伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '重击伤害加成', isPercent: true },
+        { regex: /共鸣技能伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '共鸣技能伤害加成', isPercent: true },
+        { regex: /共鸣解放伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '共鸣解放伤害加成', isPercent: true }
+    ];
+    
+    // 遍历每一行文本
+    for (const line of lines) {
+        for (const pattern of patterns) {
+            const match = line.match(pattern.regex);
+            if (match) {
+                const value = parseFloat(match[1]);
+                if (!isNaN(value) && value > 0) {
+                    results.push({
+                        attribute: pattern.attribute,
+                        value: value.toString(),
+                        confidence: 0.8 // 默认置信度
+                    });
+                    break; // 找到匹配后跳出内层循环
+                }
+            }
+        }
+    }
+    
+    // 去重并按置信度排序
+    const uniqueResults = [];
+    const seen = new Set();
+    
+    for (const result of results) {
+        const key = `${result.attribute}-${result.value}`;
+        if (!seen.has(key)) {
+            seen.add(key);
+            uniqueResults.push(result);
+        }
+    }
+    
+    return uniqueResults.sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
+}
+
+// 显示OCR识别结果
+function displayOCRResults(results) {
+    ocrResults = results;
+    const resultContent = document.getElementById('resultContent');
+    resultContent.innerHTML = '';
+
+    if (results.length === 0) {
+        resultContent.innerHTML = '<p style="text-align: center; color: #718096;">未识别到词条信息</p>';
+        return;
+    }
+
+    results.forEach((result, index) => {
+        const resultItem = document.createElement('div');
+        resultItem.className = 'result-item';
+        
+        // 根据置信度设置样式
+        const confidence = result.confidence || 0;
+        const confidenceClass = confidence >= 0.8 ? 'high-confidence' : 
+                              confidence >= 0.6 ? 'medium-confidence' : 'low-confidence';
+        
+        resultItem.innerHTML = `
+            <span class="result-label">${result.attribute}</span>
+            <span class="result-value">${result.value}</span>
+            <span class="result-confidence ${confidenceClass}" title="识别置信度 ${(confidence * 100).toFixed(1)}%">
+                ${(confidence * 100).toFixed(1)}%
+            </span>
+        `;
+        resultContent.appendChild(resultItem);
+    });
+}
+
+// 应用OCR识别结果到表格
+function applyOCRResults() {
+    if (ocrResults.length === 0) {
+        alert('没有识别结果可以应用');
+        return;
+    }
+
+    let appliedCount = 0;
+    
+    // 按顺序定义词条位置：主词条1、主词条2、副词条1-5
+    const orderedSlots = [
+        { id: 'main-1', type: 'main' },
+        { id: 'main-2', type: 'main' },
+        { id: 'sub-1', type: 'sub' },
+        { id: 'sub-2', type: 'sub' },
+        { id: 'sub-3', type: 'sub' },
+        { id: 'sub-4', type: 'sub' },
+        { id: 'sub-5', type: 'sub' }
+    ];
+
+    // 按顺序应用OCR识别结果
+    ocrResults.forEach((result, index) => {
+        if (index >= orderedSlots.length) {
+            console.warn(`OCR结果超出可用位置数量: ${result.attribute}`);
+            return;
+        }
+        
+        const slot = orderedSlots[index];
+        const attributeKey = result.attributeKey || findAttributeKey(result.attribute, slot.type);
+        
+        if (attributeKey) {
+            const attributeSelect = document.getElementById(`${slot.id}-attribute`);
+            const valueInput = document.getElementById(`${slot.id}-value`);
+            const weightInput = document.getElementById(`${slot.id}-weight`);
+            
+            if (attributeSelect && valueInput) {
+                // 检查该属性是否在当前词条类型的选项中
+                const option = attributeSelect.querySelector(`option[value="${attributeKey}"]`);
+                if (option) {
+                    // 设置属性和数值
+                    attributeSelect.value = attributeKey;
+                    valueInput.value = result.value;
+                    
+                    // 自动设置权重（如果当前有模板，使用模板权重；否则使用默认权重）
+                    let weight = '';
+                    if (currentCharacterTemplate) {
+                        // 从当前模板中查找对应属性的权重
+                        const templateWeight = getTemplateWeightForAttribute(attributeKey, slot.type);
+                        if (templateWeight !== null) {
+                            weight = templateWeight.toString();
+                        }
+                    }
+                    
+                    if (weightInput) {
+                        weightInput.value = weight;
+                    }
+                    
+                    // 触发属性改变事件以更新权重和显示
+                    handleAttributeChange(slot.id);
+                    updateEntry(slot.id);
+                    
+                    appliedCount++;
+                    console.log(`应用词条到 ${slot.id}: ${result.attribute} = ${result.value}, 权重: ${weight}`);
+                } else {
+                    console.warn(`属性 ${result.attribute} (${attributeKey}) 不适用于 ${slot.type} 词条位置`);
+                }
+            }
+        } else {
+            console.warn(`无法映射属性: ${result.attribute}`);
+        }
+    });
+
+    if (appliedCount > 0) {
+        alert(`成功按顺序应用了 ${appliedCount} 个词条！`);
+        calculateTotal();
+        
+        // 关闭OCR弹窗
+        document.getElementById('ocrModal').style.display = 'none';
+        resetOCRModal();
+    } else {
+        alert('没有找到合适的词条位置或属性映射！');
+    }
+}
+
+// 从当前模板中获取指定属性的权重
+function getTemplateWeightForAttribute(attributeKey, slotType) {
+    if (!currentCharacterTemplate || !currentTemplateTab) {
+        return null;
+    }
+    
+    // 将c4, c3, c1转换为4, 3, 1
+    const tabMapping = { 'c4': '4', 'c3': '3', 'c1': '1' };
+    const jsonKey = tabMapping[currentTemplateTab];
+    
+    // 查找主词条权重
+    if (slotType === 'main' && currentCharacterTemplate.main_props && currentCharacterTemplate.main_props[jsonKey]) {
+        const mainProps = currentCharacterTemplate.main_props[jsonKey];
+        
+        // 根据attributeKey查找对应的中文名称
+        const chineseName = getChineseNameForAttributeKey(attributeKey);
+        if (chineseName && mainProps[chineseName] !== undefined) {
+            return mainProps[chineseName];
+        }
+    }
+    
+    // 查找副词条权重
+    if (slotType === 'sub' && currentCharacterTemplate.sub_props) {
+        const subProps = currentCharacterTemplate.sub_props;
+        
+        // 根据attributeKey查找对应的中文名称
+        const chineseName = getChineseNameForAttributeKey(attributeKey);
+        if (chineseName && subProps[chineseName] !== undefined) {
+            return subProps[chineseName];
+        }
+    }
+    
+    return null;
+}
+
+// 根据属性键获取中文名称
+function getChineseNameForAttributeKey(attributeKey) {
+    const keyToChineseMap = {
+        'atk': '攻击',
+        'atk_percent': '攻击%',
+        'hp': '生命',
+        'hp_percent': '生命%',
+        'def': '防御',
+        'def_percent': '防御%',
+        'crit_rate': '暴击',
+        'crit_damage': '暴击伤害',
+        'resonance_efficiency': '共鸣效率',
+        'basic_attack_damage': '普攻伤害加成',
+        'heavy_attack_damage': '重击伤害加成',
+        'resonance_skill_damage': '共鸣技能伤害加成',
+        'resonance_liberation_damage': '共鸣解放伤害加成',
+        'element_damage': '属性伤害加成',
+        'healing_bonus': '治疗效果加成'
+    };
+    
+    return keyToChineseMap[attributeKey] || null;
+}
+
+// 重置OCR弹窗状态
+function resetOCRModal() {
+    currentImageFile = null;
+    ocrResults = [];
+    
+    const uploadArea = document.getElementById('uploadArea');
+    const previewArea = document.getElementById('previewArea');
+    const ocrLoading = document.getElementById('ocrLoading');
+    const ocrResult = document.getElementById('ocrResult');
+    const previewImg = document.getElementById('previewImg');
+    const fileInput = document.getElementById('fileInput');
+    const resultContent = document.getElementById('resultContent');
+    
+    if (uploadArea) uploadArea.style.display = 'block';
+    if (previewArea) previewArea.style.display = 'none';
+    if (ocrLoading) ocrLoading.style.display = 'none';
+    if (ocrResult) ocrResult.style.display = 'none';
+    
+    if (previewImg) previewImg.src = '';
+    if (fileInput) fileInput.value = '';
+    if (resultContent) resultContent.innerHTML = '';
+    if (uploadArea) uploadArea.classList.remove('dragover');
+}

@@ -16,8 +16,16 @@
                     <span class="hamburger-line"></span>
                     <span class="hamburger-line"></span>
                 </button>
-                <h1><img src="https://pic1.imgdb.cn/item/6885d68758cb8da5c8e446a6.png" alt="鸣潮图标" style="width: 50px; height: 50px; vertical-align: middle;"> 鸣潮词条分数计算器</h1>
-                <p>根据词条数值和权重计算分数</p>
+                <div class="header-main">
+                    <h1><img src="https://pic1.imgdb.cn/item/6885d68758cb8da5c8e446a6.png" alt="鸣潮图标" style="width: 50px; height: 50px; vertical-align: middle;"> 鸣潮词条分数计算器</h1>
+                    <p>根据词条数值和权重计算分数</p>
+                </div>
+                <div class="header-actions">
+                    <button class="ocr-btn" id="ocrBtn">
+                        <span class="ocr-icon">📷</span>
+                        <span class="ocr-text">OCR识别</span>
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -155,7 +163,59 @@
         </main>
     </div>
 
+    <!-- OCR弹窗 -->
+    <div class="ocr-modal" id="ocrModal">
+        <div class="ocr-modal-content">
+            <div class="ocr-modal-header">
+                <h3>📷 OCR图片识别</h3>
+                <button class="ocr-modal-close" id="closeOcrModal">×</button>
+            </div>
+            <div class="ocr-modal-body">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-content">
+                        <div class="upload-icon">📁</div>
+                        <p class="upload-text">拖拽图片到此处或点击上传</p>
+                        <p class="upload-hint">支持 JPG、PNG、GIF 格式</p>
+                        <button class="upload-btn" id="uploadBtn">选择图片</button>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                </div>
+                <div class="preview-area" id="previewArea" style="display: none;">
+                    <div class="preview-header">
+                        <h4>预览图片</h4>
+                        <button class="preview-remove" id="previewRemove">删除</button>
+                    </div>
+                    <div class="preview-image">
+                        <img id="previewImg" alt="预览图片">
+                    </div>
+                    <div class="ocr-actions">
+                        <button class="ocr-process-btn" id="startOcrBtn">
+                            <span class="process-icon">🔍</span>
+                            <span class="process-text">开始识别</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="ocr-result" id="ocrResult" style="display: none;">
+                    <div class="result-header">
+                        <h4>识别结果</h4>
+                        <button class="result-apply" id="applyResultsBtn">应用到表格</button>
+                    </div>
+                    <div class="result-content" id="resultContent">
+                        <!-- 识别结果将在这里显示 -->
+                    </div>
+                </div>
+                <div class="ocr-loading" id="ocrLoading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <p>正在识别中，请稍候...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="config.js"></script>
+
+    <!-- Tesseract.js for client-side OCR -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

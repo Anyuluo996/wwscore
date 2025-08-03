@@ -61,11 +61,19 @@ class OCRHandler(http.server.SimpleHTTPRequestHandler):
         try:
             if not hasattr(self, 'paddle_ocr') or self.paddle_ocr is None:
                 paddle_config = config.get('config', {})
-                self.paddle_ocr = PaddleOCR(
-                    use_textline_orientation=paddle_config.get('use_angle_cls', True),
-                    use_gpu=paddle_config.get('use_gpu', False),
-                    lang=paddle_config.get('lang', 'ch')
-                )
+                # 使用最基本的参数初始化PaddleOCR
+                init_params = {
+                    'lang': paddle_config.get('lang', 'ch')
+                }
+                
+                # 只在支持的情况下添加可选参数
+                if paddle_config.get('use_angle_cls', True):
+                    try:
+                        init_params['use_textline_orientation'] = True
+                    except:
+                        pass  # 如果不支持就忽略
+                
+                self.paddle_ocr = PaddleOCR(**init_params)
                 print("PaddleOCR 初始化成功")
             return True
         except Exception as e:

@@ -62,34 +62,45 @@ class OCRHandler(http.server.SimpleHTTPRequestHandler):
             if not hasattr(self, 'paddle_ocr') or self.paddle_ocr is None:
                 paddle_config = config.get('config', {})
                 
-                # 使用最基本和兼容的参数
-                init_params = {
-                    'lang': paddle_config.get('lang', 'ch'),
-                    'use_gpu': False,  # 强制禁用GPU，确保CPU模式
+                # 使用最基本的参数，确保最大兼容性
+                base_params = {
+                    'lang': paddle_config.get('lang', 'ch')
                 }
                 
-                # 尝试添加可选的优化参数（如果支持）
-                optional_params = {
-                    'enable_mkldnn': False,  # 禁用MKLDNN以减少内存使用
-                    'cpu_threads': 1,  # 限制CPU线程数，适合低配置
-                    'use_textline_orientation': False,  # 禁用文本方向检测以节省资源
-                }
+                # 可选参数列表，按重要性排序
+                optional_params = [
+                    ('use_gpu', False),
+                    ('enable_mkldnn', False),
+                    ('cpu_threads', 1),
+                    ('use_textline_orientation', False),
+                ]
+                
+                # 从基础参数开始
+                init_params = base_params.copy()
                 
                 # 逐个尝试添加可选参数
-                for param_name, param_value in optional_params.items():
+                for param_name, param_value in optional_params:
                     try:
-                        # 先创建一个测试实例来验证参数是否支持
+                        # 创建测试参数
                         test_params = init_params.copy()
                         test_params[param_name] = param_value
-                        # 如果参数被支持，添加到最终参数中
+                        
+                        # 尝试创建PaddleOCR实例来测试参数
+                        test_ocr = PaddleOCR(**test_params)
+                        
+                        # 如果成功，添加到最终参数中
                         init_params[param_name] = param_value
-                        print(f"已添加优化参数: {param_name}={param_value}")
+                        print(f"✓ 已添加优化参数: {param_name}={param_value}")
+                        
+                        # 清理测试实例
+                        del test_ocr
+                        
                     except Exception as e:
-                        print(f"跳过不支持的参数: {param_name} ({e})")
+                        print(f"✗ 跳过不支持的参数: {param_name} ({str(e)[:50]}...)")
                         continue
                 
-                print("正在初始化PaddleOCR（低配置兼容模式）...")
-                print(f"使用参数: {init_params}")
+                print("正在初始化PaddleOCR（最大兼容模式）...")
+                print(f"最终使用参数: {init_params}")
                 self.paddle_ocr = PaddleOCR(**init_params)
                 print("PaddleOCR 初始化成功")
             return True

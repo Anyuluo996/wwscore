@@ -1200,30 +1200,67 @@ function parseOCRResult(ocrData) {
     }
     
     const wordsResult = ocrData.words_result;
-    const results = [];
     
-    // 属性名称映射
-    const attributeMap = {
-        '生命': 'hp',
-        '攻击': 'atk', 
-        '防御': 'def',
-        '暴击': 'crit_rate',
-        '暴击伤害': 'crit_damage',
-        '共鸣效率': 'resonance_efficiency',
-        '普攻伤害加成': 'basic_attack_damage',
-        '重击伤害加成': 'heavy_attack_damage',
-        '共鸣技能伤害加成': 'resonance_skill_damage',
-        '共鸣解放伤害加成': 'resonance_liberation_damage',
-        '属性伤害加成': 'element_damage',
-        '治疗效果加成': 'healing_bonus'
-    };
+    // 定义词条匹配规则
+    const attributeRules = [
+        // 完整词条匹配（最高优先级）
+        { pattern: '暴击伤害', key: 'crit_damage', name: '暴击伤害', priority: 10 },
+        { pattern: '普攻伤害加成', key: 'basic_attack_damage', name: '普攻伤害加成', priority: 10 },
+        { pattern: '重击伤害加成', key: 'heavy_attack_damage', name: '重击伤害加成', priority: 10 },
+        { pattern: '共鸣技能伤害加成', key: 'resonance_skill_damage', name: '共鸣技能伤害加成', priority: 10 },
+        { pattern: '共鸣解放伤害加成', key: 'resonance_liberation_damage', name: '共鸣解放伤害加成', priority: 10 },
+        { pattern: '属性伤害加成', key: 'element_damage', name: '属性伤害加成', priority: 10 },
+        { pattern: '治疗效果加成', key: 'healing_bonus', name: '治疗效果加成', priority: 10 },
+        { pattern: '共鸣效率', key: 'resonance_efficiency', name: '共鸣效率', priority: 10 },
+        { pattern: '暴击率', key: 'crit_rate', name: '暴击', priority: 10 },
+        { pattern: '暴击', key: 'crit_rate', name: '暴击', priority: 9 },
+        { pattern: '攻击', key: 'atk', name: '攻击', priority: 8 },
+        { pattern: '生命', key: 'hp', name: '生命', priority: 8 },
+        { pattern: '防御', key: 'def', name: '防御', priority: 8 },
+        
+        // 模糊匹配（较低优先级）
+        { pattern: '击伤害', key: 'crit_damage', name: '暴击伤害', priority: 5 },
+        { pattern: '击率', key: 'crit_rate', name: '暴击', priority: 5 },
+        { pattern: '伤害加成', key: 'element_damage', name: '属性伤害加成', priority: 4 },
+        { pattern: '效率', key: 'resonance_efficiency', name: '共鸣效率', priority: 4 },
+        { pattern: '击', key: 'atk', name: '攻击', priority: 3 },
+        { pattern: '命', key: 'hp', name: '生命', priority: 3 },
+        { pattern: '御', key: 'def', name: '防御', priority: 3 }
+    ];
     
-    // 遍历识别结果，寻找属性和数值的配对
+    // 查找属性匹配函数
+    function findBestAttributeMatch(text) {
+        let bestMatch = null;
+        let highestPriority = 0;
+        
+        for (const rule of attributeRules) {
+            if (text.includes(rule.pattern)) {
+                if (rule.priority > highestPriority) {
+                    bestMatch = {
+                        key: rule.key,
+                        name: rule.name,
+                        priority: rule.priority,
+                        confidence: text === rule.pattern ? 1.0 : (rule.priority / 10)
+                    };
+                    highestPriority = rule.priority;
+                }
+            }
+        }
+        
+        return bestMatch;
+    }
+    
+    // 按顺序收集词条-数值对（严格按照声骸位置顺序）
+    const orderedResults = [];
+    let attributeValuePairs = [];
+    
+    // 第一步：收集所有属性-数值对
     for (let i = 0; i < wordsResult.length; i++) {
         const currentWord = wordsResult[i].words.trim();
         
-        // 检查是否是属性名称
-        if (attributeMap[currentWord]) {
+        // 检查是否包含属性名称
+        const attributeMatch = findBestAttributeMatch(currentWord);
+        if (attributeMatch) {
             // 寻找后续的数值
             for (let j = i + 1; j < Math.min(i + 3, wordsResult.length); j++) {
                 const nextWord = wordsResult[j].words.trim();
@@ -1236,11 +1273,11 @@ function parseOCRResult(ocrData) {
                     
                     if (!isNaN(value) && value > 0) {
                         // 智能确定属性类型（根据%号区分基础属性和百分比属性）
-                        let attributeType = attributeMap[currentWord];
-                        let displayName = currentWord;
+                        let attributeType = attributeMatch.key;
+                        let displayName = attributeMatch.name;
                         
                         // 根据是否有%号来区分属性类型
-                        if (currentWord === '攻击') {
+                        if (attributeMatch.key === 'atk') {
                             if (isPercent) {
                                 attributeType = 'atk_percent';
                                 displayName = '攻击百分比';
@@ -1248,7 +1285,7 @@ function parseOCRResult(ocrData) {
                                 attributeType = 'atk';
                                 displayName = '攻击';
                             }
-                        } else if (currentWord === '生命') {
+                        } else if (attributeMatch.key === 'hp') {
                             if (isPercent) {
                                 attributeType = 'hp_percent';
                                 displayName = '生命百分比';
@@ -1256,7 +1293,7 @@ function parseOCRResult(ocrData) {
                                 attributeType = 'hp';
                                 displayName = '生命';
                             }
-                        } else if (currentWord === '防御') {
+                        } else if (attributeMatch.key === 'def') {
                             if (isPercent) {
                                 attributeType = 'def_percent';
                                 displayName = '防御百分比';
@@ -1264,19 +1301,20 @@ function parseOCRResult(ocrData) {
                                 attributeType = 'def';
                                 displayName = '防御';
                             }
-                        } else {
-                            // 其他属性保持原有逻辑
-                            displayName = currentWord;
                         }
                         
-                        results.push({
+                        attributeValuePairs.push({
                             attribute: displayName,
                             attributeKey: attributeType,
                             value: value.toString(),
-                            confidence: 0.9
+                            confidence: attributeMatch.confidence,
+                            priority: attributeMatch.priority,
+                            originalText: currentWord,
+                            position: i,
+                            slotType: null // 稍后确定是主词条还是副词条
                         });
                         
-                        console.log(`识别到词条: ${displayName} = ${value}${isPercent ? '%' : ''}`);
+                        console.log(`发现词条: ${displayName} = ${value}${isPercent ? '%' : ''} (位置: ${i}, 原文: ${currentWord})`);
                         break;
                     }
                 }
@@ -1284,77 +1322,199 @@ function parseOCRResult(ocrData) {
         }
     }
     
-    console.log('解析结果:', results);
-    return results;
+    // 第二步：按位置排序，严格按照声骸顺序分配
+    attributeValuePairs.sort((a, b) => a.position - b.position);
+    
+    // 第三步：严格按照2个主词条 + 5个副词条的顺序分配
+    const maxSlots = 7; // 2主词条 + 5副词条
+    for (let i = 0; i < Math.min(attributeValuePairs.length, maxSlots); i++) {
+        const pair = attributeValuePairs[i];
+        
+        // 确定词条类型：前2个是主词条，后5个是副词条
+        if (i < 2) {
+            pair.slotType = 'main';
+            pair.slotIndex = i + 1; // main-1, main-2
+        } else {
+            pair.slotType = 'sub';
+            pair.slotIndex = i - 1; // sub-1, sub-2, sub-3, sub-4, sub-5
+        }
+        
+        orderedResults.push({
+            attribute: pair.attribute,
+            attributeKey: pair.attributeKey,
+            value: pair.value,
+            confidence: pair.confidence,
+            originalText: pair.originalText,
+            slotType: pair.slotType,
+            slotIndex: pair.slotIndex,
+            slotId: `${pair.slotType}-${pair.slotIndex}`
+        });
+        
+        console.log(`分配词条到位置 ${pair.slotType}-${pair.slotIndex}: ${pair.attribute} = ${pair.value} (原文: ${pair.originalText})`);
+    }
+    
+    console.log('按顺序解析结果:', orderedResults);
+    return orderedResults;
 }
 
 // 解析OCR文本结果
 function parseOCRText(text) {
-    const results = [];
-    const lines = text.split('\n').filter(line => line.trim());
+    console.log('解析OCR文本:', text);
     
-    // 词条属性匹配模式
-    const patterns = [
-        // 攻击相关
-        { regex: /攻击\s*[+]?\s*(\d+\.?\d*)%/i, attribute: '攻击百分比', attributeKey: 'atk_percent', isPercent: true },
-        { regex: /攻击\s*[+]?\s*(\d+\.?\d*)/i, attribute: '攻击', attributeKey: 'atk', isPercent: false },
+    if (!text || typeof text !== 'string') {
+        return [];
+    }
+    
+    const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+    
+    // 使用与parseOCRResult相同的规则
+    const attributeRules = [
+        // 完整词条匹配（最高优先级）
+        { pattern: '暴击伤害', key: 'crit_damage', name: '暴击伤害', priority: 10 },
+        { pattern: '普攻伤害加成', key: 'basic_attack_damage', name: '普攻伤害加成', priority: 10 },
+        { pattern: '重击伤害加成', key: 'heavy_attack_damage', name: '重击伤害加成', priority: 10 },
+        { pattern: '共鸣技能伤害加成', key: 'resonance_skill_damage', name: '共鸣技能伤害加成', priority: 10 },
+        { pattern: '共鸣解放伤害加成', key: 'resonance_liberation_damage', name: '共鸣解放伤害加成', priority: 10 },
+        { pattern: '属性伤害加成', key: 'element_damage', name: '属性伤害加成', priority: 10 },
+        { pattern: '治疗效果加成', key: 'healing_bonus', name: '治疗效果加成', priority: 10 },
+        { pattern: '共鸣效率', key: 'resonance_efficiency', name: '共鸣效率', priority: 10 },
+        { pattern: '暴击率', key: 'crit_rate', name: '暴击', priority: 10 },
+        { pattern: '暴击', key: 'crit_rate', name: '暴击', priority: 9 },
+        { pattern: '攻击', key: 'atk', name: '攻击', priority: 8 },
+        { pattern: '生命', key: 'hp', name: '生命', priority: 8 },
+        { pattern: '防御', key: 'def', name: '防御', priority: 8 },
         
-        // 生命相关
-        { regex: /生命\s*[+]?\s*(\d+\.?\d*)%/i, attribute: '生命百分比', attributeKey: 'hp_percent', isPercent: true },
-        { regex: /生命\s*[+]?\s*(\d+\.?\d*)/i, attribute: '生命', attributeKey: 'hp', isPercent: false },
-        
-        // 防御相关
-        { regex: /防御\s*[+]?\s*(\d+\.?\d*)%/i, attribute: '防御百分比', attributeKey: 'def_percent', isPercent: true },
-        { regex: /防御\s*[+]?\s*(\d+\.?\d*)/i, attribute: '防御', attributeKey: 'def', isPercent: false },
-        
-        // 暴击相关
-        { regex: /暴击率?\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '暴击', attributeKey: 'crit_rate', isPercent: true },
-        { regex: /暴击伤害\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '暴击伤害', attributeKey: 'crit_damage', isPercent: true },
-        
-        // 特殊属性
-        { regex: /共鸣效率\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '共鸣效率', attributeKey: 'resonance_efficiency', isPercent: true },
-        { regex: /属性伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '属性伤害加成', attributeKey: 'element_damage', isPercent: true },
-        { regex: /治疗效果加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '治疗效果加成', attributeKey: 'healing_bonus', isPercent: true },
-        
-        // 技能伤害
-        { regex: /普攻伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '普攻伤害加成', attributeKey: 'basic_attack_damage', isPercent: true },
-        { regex: /重击伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '重击伤害加成', attributeKey: 'heavy_attack_damage', isPercent: true },
-        { regex: /共鸣技能伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '共鸣技能伤害加成', attributeKey: 'resonance_skill_damage', isPercent: true },
-        { regex: /共鸣解放伤害加成\s*[+]?\s*(\d+\.?\d*)%?/i, attribute: '共鸣解放伤害加成', attributeKey: 'resonance_liberation_damage', isPercent: true }
+        // 模糊匹配（较低优先级）
+        { pattern: '击伤害', key: 'crit_damage', name: '暴击伤害', priority: 5 },
+        { pattern: '击率', key: 'crit_rate', name: '暴击', priority: 5 },
+        { pattern: '伤害加成', key: 'element_damage', name: '属性伤害加成', priority: 4 },
+        { pattern: '效率', key: 'resonance_efficiency', name: '共鸣效率', priority: 4 },
+        { pattern: '击', key: 'atk', name: '攻击', priority: 3 },
+        { pattern: '命', key: 'hp', name: '生命', priority: 3 },
+        { pattern: '御', key: 'def', name: '防御', priority: 3 }
     ];
     
-    // 遍历每一行文本
-    for (const line of lines) {
-        for (const pattern of patterns) {
-            const match = line.match(pattern.regex);
-            if (match) {
-                const value = parseFloat(match[1]);
+    // 查找属性匹配函数
+    function findBestAttributeMatch(text) {
+        let bestMatch = null;
+        let highestPriority = 0;
+        
+        for (const rule of attributeRules) {
+            if (text.includes(rule.pattern)) {
+                if (rule.priority > highestPriority) {
+                    bestMatch = {
+                        key: rule.key,
+                        name: rule.name,
+                        priority: rule.priority,
+                        confidence: text === rule.pattern ? 1.0 : (rule.priority / 10)
+                    };
+                    highestPriority = rule.priority;
+                }
+            }
+        }
+        
+        return bestMatch;
+    }
+    
+    // 按顺序收集词条-数值对（严格按照声骸位置顺序）
+    const orderedResults = [];
+    let attributeValuePairs = [];
+    
+    // 第一步：收集所有属性-数值对
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        
+        // 检查是否包含属性名称
+        const attributeMatch = findBestAttributeMatch(line);
+        if (attributeMatch) {
+            // 在同一行中寻找数值
+            const valueMatch = line.match(/(\d+\.?\d*)%?/);
+            if (valueMatch) {
+                const value = parseFloat(valueMatch[1]);
+                const isPercent = line.includes('%');
+                
                 if (!isNaN(value) && value > 0) {
-                    results.push({
-                        attribute: pattern.attribute,
-                        attributeKey: pattern.attributeKey,
+                    // 智能确定属性类型（根据%号区分基础属性和百分比属性）
+                    let attributeType = attributeMatch.key;
+                    let displayName = attributeMatch.name;
+                    
+                    // 根据是否有%号来区分属性类型
+                    if (attributeMatch.key === 'atk') {
+                        if (isPercent) {
+                            attributeType = 'atk_percent';
+                            displayName = '攻击百分比';
+                        } else {
+                            attributeType = 'atk';
+                            displayName = '攻击';
+                        }
+                    } else if (attributeMatch.key === 'hp') {
+                        if (isPercent) {
+                            attributeType = 'hp_percent';
+                            displayName = '生命百分比';
+                        } else {
+                            attributeType = 'hp';
+                            displayName = '生命';
+                        }
+                    } else if (attributeMatch.key === 'def') {
+                        if (isPercent) {
+                            attributeType = 'def_percent';
+                            displayName = '防御百分比';
+                        } else {
+                            attributeType = 'def';
+                            displayName = '防御';
+                        }
+                    }
+                    
+                    attributeValuePairs.push({
+                        attribute: displayName,
+                        attributeKey: attributeType,
                         value: value.toString(),
-                        confidence: 0.8 // 默认置信度
+                        confidence: attributeMatch.confidence,
+                        priority: attributeMatch.priority,
+                        originalText: line,
+                        position: i,
+                        slotType: null // 稍后确定是主词条还是副词条
                     });
-                    break; // 找到匹配后跳出内层循环
+                    
+                    console.log(`发现词条: ${displayName} = ${value}${isPercent ? '%' : ''} (位置: ${i}, 原文: ${line})`);
                 }
             }
         }
     }
     
-    // 去重并按置信度排序
-    const uniqueResults = [];
-    const seen = new Set();
+    // 第二步：按位置排序，严格按照声骸顺序分配
+    attributeValuePairs.sort((a, b) => a.position - b.position);
     
-    for (const result of results) {
-        const key = `${result.attribute}-${result.value}`;
-        if (!seen.has(key)) {
-            seen.add(key);
-            uniqueResults.push(result);
+    // 第三步：严格按照2个主词条 + 5个副词条的顺序分配
+    const maxSlots = 7; // 2主词条 + 5副词条
+    for (let i = 0; i < Math.min(attributeValuePairs.length, maxSlots); i++) {
+        const pair = attributeValuePairs[i];
+        
+        // 确定词条类型：前2个是主词条，后5个是副词条
+        if (i < 2) {
+            pair.slotType = 'main';
+            pair.slotIndex = i + 1; // main-1, main-2
+        } else {
+            pair.slotType = 'sub';
+            pair.slotIndex = i - 1; // sub-1, sub-2, sub-3, sub-4, sub-5
         }
+        
+        orderedResults.push({
+            attribute: pair.attribute,
+            attributeKey: pair.attributeKey,
+            value: pair.value,
+            confidence: pair.confidence,
+            originalText: pair.originalText,
+            slotType: pair.slotType,
+            slotIndex: pair.slotIndex,
+            slotId: `${pair.slotType}-${pair.slotIndex}`
+        });
+        
+        console.log(`分配词条到位置 ${pair.slotType}-${pair.slotIndex}: ${pair.attribute} = ${pair.value} (原文: ${pair.originalText})`);
     }
     
-    return uniqueResults.sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
+    console.log('按顺序解析结果:', orderedResults);
+    return orderedResults;
 }
 
 // 显示OCR识别结果
@@ -1377,7 +1537,15 @@ function displayOCRResults(results) {
         const confidenceClass = confidence >= 0.8 ? 'high-confidence' : 
                               confidence >= 0.6 ? 'medium-confidence' : 'low-confidence';
         
+        // 构建显示内容，包含位置信息
+        let positionInfo = '';
+        if (result.slotType && result.slotIndex) {
+            const slotTypeName = result.slotType === 'main' ? '主词条' : '副词条';
+            positionInfo = `<span class="result-position" title="词条位置">${slotTypeName}${result.slotIndex}</span>`;
+        }
+        
         resultItem.innerHTML = `
+            ${positionInfo}
             <span class="result-label">${result.attribute}</span>
             <span class="result-value">${result.value}</span>
             <span class="result-confidence ${confidenceClass}" title="识别置信度 ${(confidence * 100).toFixed(1)}%">
@@ -1410,18 +1578,28 @@ function applyOCRResults() {
 
     // 按顺序应用OCR识别结果
     ocrResults.forEach((result, index) => {
-        if (index >= orderedSlots.length) {
-            console.warn(`OCR结果超出可用位置数量: ${result.attribute}`);
-            return;
+        // 如果结果包含位置信息，使用位置信息；否则按顺序分配
+        let targetSlot;
+        if (result.slotId) {
+            // 使用OCR结果中的位置信息
+            targetSlot = { id: result.slotId, type: result.slotType };
+            console.log(`使用OCR位置信息: ${result.slotId} (${result.slotType})`);
+        } else {
+            // 按顺序分配到可用位置
+            if (index >= orderedSlots.length) {
+                console.warn(`OCR结果超出可用位置数量: ${result.attribute}`);
+                return;
+            }
+            targetSlot = orderedSlots[index];
+            console.log(`按顺序分配到位置: ${targetSlot.id} (${targetSlot.type})`);
         }
         
-        const slot = orderedSlots[index];
-        const attributeKey = result.attributeKey || findAttributeKey(result.attribute, slot.type);
+        const attributeKey = result.attributeKey || findAttributeKey(result.attribute, targetSlot.type);
         
         if (attributeKey) {
-            const attributeSelect = document.getElementById(`${slot.id}-attribute`);
-            const valueInput = document.getElementById(`${slot.id}-value`);
-            const weightInput = document.getElementById(`${slot.id}-weight`);
+            const attributeSelect = document.getElementById(`${targetSlot.id}-attribute`);
+            const valueInput = document.getElementById(`${targetSlot.id}-value`);
+            const weightInput = document.getElementById(`${targetSlot.id}-weight`);
             
             if (attributeSelect && valueInput) {
                 // 检查该属性是否在当前词条类型的选项中
@@ -1435,7 +1613,7 @@ function applyOCRResults() {
                     let weight = '';
                     if (currentCharacterTemplate) {
                         // 从当前模板中查找对应属性的权重
-                        const templateWeight = getTemplateWeightForAttribute(attributeKey, slot.type);
+                        const templateWeight = getTemplateWeightForAttribute(attributeKey, targetSlot.type);
                         if (templateWeight !== null) {
                             weight = templateWeight.toString();
                         }
@@ -1446,13 +1624,13 @@ function applyOCRResults() {
                     }
                     
                     // 触发属性改变事件以更新权重和显示
-                    handleAttributeChange(slot.id);
-                    updateEntry(slot.id);
+                    handleAttributeChange(targetSlot.id);
+                    updateEntry(targetSlot.id);
                     
                     appliedCount++;
-                    console.log(`应用词条到 ${slot.id}: ${result.attribute} = ${result.value}, 权重: ${weight}`);
+                    console.log(`应用词条到 ${targetSlot.id}: ${result.attribute} = ${result.value}, 权重: ${weight}`);
                 } else {
-                    console.warn(`属性 ${result.attribute} (${attributeKey}) 不适用于 ${slot.type} 词条位置`);
+                    console.warn(`属性 ${result.attribute} (${attributeKey}) 不适用于 ${targetSlot.type} 词条位置`);
                 }
             }
         } else {

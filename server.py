@@ -62,10 +62,9 @@ class OCRHandler(http.server.SimpleHTTPRequestHandler):
             if not hasattr(self, 'paddle_ocr') or self.paddle_ocr is None:
                 paddle_config = config.get('config', {})
                 self.paddle_ocr = PaddleOCR(
-                    use_angle_cls=paddle_config.get('use_angle_cls', True),
+                    use_textline_orientation=paddle_config.get('use_angle_cls', True),
                     use_gpu=paddle_config.get('use_gpu', False),
-                    lang=paddle_config.get('lang', 'ch'),
-                    show_log=False
+                    lang=paddle_config.get('lang', 'ch')
                 )
                 print("PaddleOCR 初始化成功")
             return True
@@ -220,7 +219,7 @@ class OCRHandler(http.server.SimpleHTTPRequestHandler):
             
             # 使用PaddleOCR进行识别
             start_time = time.time()
-            ocr_result = self.paddle_ocr.ocr(image_np, cls=config.get('use_angle_cls', True))
+            ocr_result = self.paddle_ocr.ocr(image_np, cls=config.get('use_textline_orientation', True))
             end_time = time.time()
             
             print(f"PaddleOCR识别耗时: {end_time - start_time:.2f}秒")

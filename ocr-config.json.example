@@ -14,12 +14,8 @@
             "enabled": true,
             "priority": 1,
             "config": {
-                "use_angle_cls": false,
-                "use_gpu": false,
                 "lang": "ch",
-                "enable_mkldnn": false,
-                "cpu_threads": 1,
-                "max_text_length": 25
+                "use_gpu": false
             }
         }
     ],

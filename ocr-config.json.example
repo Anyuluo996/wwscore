@@ -1,0 +1,25 @@
+{
+    "ocr_providers": [
+        {
+            "name": "baidu",
+            "enabled": true,
+            "priority": 1,
+            "config": {
+                "apiKey": "your_baidu_api_key_here",
+                "secretKey": "your_baidu_secret_key_here"
+            }
+        },
+        {
+            "name": "paddleocr",
+            "enabled": true,
+            "priority": 2,
+            "config": {
+                "use_angle_cls": true,
+                "use_gpu": false,
+                "lang": "ch"
+            }
+        }
+    ],
+    "fallback_enabled": true,
+    "timeout": 30
+}

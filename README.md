@@ -25,11 +25,13 @@
 
 #### 完整功能（包含OCR识别）
 1. 克隆或下载项目文件
-2. 配置OCR API：
-   - 在`ocr-config.json`中填入百度OCR API的密钥信息
+2. 配置OCR：
+   - 复制 `ocr-config.json.example` 为 `ocr-config.json`
+   - 配置OCR提供商（可选择百度OCR、PaddleOCR或同时启用）
+   - 设置优先级和启用状态
 3. 安装Python依赖：
    ```bash
-   pip install flask requests
+   pip install -r requirements.txt
    ```
 4. 启动Python服务器：
    ```bash
@@ -68,6 +70,44 @@
 5. **清空历史**: 点击"清空历史"按钮清除所有记录
 6. **自动保存**: 系统自动保存最近50条识别记录
 
+### ⚙️ OCR配置说明
+系统支持多种OCR引擎，可在 `ocr-config.json` 中配置：
+
+#### 配置示例
+```json
+{
+    "ocr_providers": [
+        {
+            "name": "baidu",
+            "enabled": true,
+            "priority": 1,
+            "config": {
+                "apiKey": "your_baidu_api_key",
+                "secretKey": "your_baidu_secret_key"
+            }
+        },
+        {
+            "name": "paddleocr",
+            "enabled": true,
+            "priority": 2,
+            "config": {
+                "use_angle_cls": true,
+                "use_gpu": false,
+                "lang": "ch"
+            }
+        }
+    ],
+    "fallback_enabled": true,
+    "timeout": 30
+}
+```
+
+#### 配置说明
+- **enabled**: 是否启用该OCR提供商
+- **priority**: 优先级（数字越小优先级越高）
+- **fallback_enabled**: 是否启用自动切换（第一个失败时使用第二个）
+- **百度OCR**: 需要API密钥，识别精度高，有调用限制
+- **PaddleOCR**: 本地识别，无需网络，免费使用
 
 ## 📊 计算公式
 
@@ -88,7 +128,7 @@
 - **前端**: HTML5 + CSS3 + JavaScript (ES6+)
 - **样式**: 原生CSS，响应式设计
 - **数据**: JSON格式的角色配置文件
-- **OCR识别**: 百度OCR API，支持高精度文字识别
+- **OCR识别**: 支持多种OCR引擎（百度OCR API、PaddleOCR），可配置优先级和自动切换
 - **数据存储**: localStorage本地存储历史记录
 - **后端**: Python Flask服务器（用于OCR API调用）
 - **部署**: 静态文件 + Python服务器
@@ -102,7 +142,9 @@ wwscore/
 ├── style.css               # 样式文件
 ├── config.js               # 配置文件（角色列表等）
 ├── server.py               # Python服务器（OCR API调用）
-├── ocr-config.json         # OCR配置文件（API密钥等）
+├── ocr-config.json         # OCR配置文件
+├── ocr-config.json.example # OCR配置文件示例
+├── requirements.txt        # Python依赖文件
 ├── character/              # 角色配置目录
 │   ├── 角色名/
 │   │   └── calc.json       # 角色配置文件

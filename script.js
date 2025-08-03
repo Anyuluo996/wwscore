@@ -1069,6 +1069,11 @@ async function performOCR() {
         return;
     }
     
+    console.log('开始OCR识别，当前文件:', currentImageFile);
+    console.log('文件类型:', typeof currentImageFile);
+    console.log('是否为File对象:', currentImageFile instanceof File);
+    console.log('是否为Blob对象:', currentImageFile instanceof Blob);
+    
     const ocrLoading = document.getElementById('ocrLoading');
     const ocrResult = document.getElementById('ocrResult');
     const startOcrBtn = document.getElementById('startOcrBtn');
@@ -1079,8 +1084,8 @@ async function performOCR() {
         ocrResult.style.display = 'none';
         startOcrBtn.disabled = true;
         
-        // 只使用百度OCR
-        const results = await baiduOCR(currentImageFile);
+        // 使用统一OCR API（支持多提供商自动切换）
+        const results = await performOCRWithProvider(currentImageFile);
         
         if (results && results.length > 0) {
             displayOCRResults(results);
@@ -1098,18 +1103,16 @@ async function performOCR() {
     }
 }
 
-// 百度OCR识别
-async function baiduOCR(imageFile) {
+// 统一OCR识别（支持多提供商自动切换）
+async function performOCRWithProvider(imageFile) {
     try {
-        console.log('开始百度OCR识别...');
-        
-        // 百度OCR已启用
+        console.log('开始OCR识别...');
         
         // 将图片转换为Base64
         const imageBase64 = await fileToBase64(imageFile);
         
-        // 调用本地后端API
-        const response = await fetch('/api/baidu-ocr', {
+        // 调用统一OCR API
+        const response = await fetch('/api/ocr', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -1127,21 +1130,31 @@ async function baiduOCR(imageFile) {
         const data = await response.json();
         
         if (data.error_code) {
-            throw new Error(`百度OCR API错误: ${data.error_msg}`);
+            throw new Error(`OCR API错误: ${data.error_msg}`);
         }
         
         if (!data.words_result || data.words_result.length === 0) {
-            console.log('百度OCR未识别到文字内容');
+            console.log('OCR未识别到文字内容');
             return [];
         }
         
-        // 解析百度OCR结果
-        return parseBaiduOCRResult(data);
+        // 显示使用的OCR提供商
+        if (data.provider) {
+            console.log(`OCR识别成功，使用提供商: ${data.provider}`);
+        }
+        
+        // 解析OCR结果（兼容百度OCR格式）
+        return parseOCRResult(data);
         
     } catch (error) {
-        console.error('百度OCR识别失败:', error);
+        console.error('OCR识别失败:', error);
         throw error;
     }
+}
+
+// 百度OCR识别（保留兼容性）
+async function baiduOCR(imageFile) {
+    return await performOCRWithProvider(imageFile);
 }
 
 
@@ -1149,19 +1162,37 @@ async function baiduOCR(imageFile) {
 // 将文件转换为base64
 function fileToBase64(file) {
     return new Promise((resolve, reject) => {
+        // 验证参数
+        if (!file) {
+            reject(new Error('文件参数为空'));
+            return;
+        }
+        
+        if (!(file instanceof File) && !(file instanceof Blob)) {
+            console.error('无效的文件对象:', file);
+            reject(new Error('参数不是有效的文件对象'));
+            return;
+        }
+        
+        console.log('开始转换文件为Base64:', file.name, file.type, file.size);
+        
         const reader = new FileReader();
         reader.onload = () => {
             // 移除data:image/...;base64,前缀
             const base64 = reader.result.split(',')[1];
+            console.log('文件转换为Base64成功，长度:', base64.length);
             resolve(base64);
         };
-        reader.onerror = reject;
+        reader.onerror = (error) => {
+            console.error('FileReader错误:', error);
+            reject(error);
+        };
         reader.readAsDataURL(file);
     });
 }
 
-// 解析百度OCR结果
-function parseBaiduOCRResult(ocrData) {
+// 解析OCR结果（兼容百度OCR格式）
+function parseOCRResult(ocrData) {
     console.log('解析百度OCR结果:', ocrData);
     
     if (!ocrData.words_result || ocrData.words_result.length === 0) {

@@ -61,18 +61,30 @@ class OCRHandler(http.server.SimpleHTTPRequestHandler):
         try:
             if not hasattr(self, 'paddle_ocr') or self.paddle_ocr is None:
                 paddle_config = config.get('config', {})
-                # 使用最基本的参数初始化PaddleOCR
+                # 为低配置服务器优化的参数
                 init_params = {
-                    'lang': paddle_config.get('lang', 'ch')
+                    'lang': paddle_config.get('lang', 'ch'),
+                    'use_gpu': False,  # 强制禁用GPU，确保CPU模式
+                    'enable_mkldnn': False,  # 禁用MKLDNN以减少内存使用
+                    'cpu_threads': 1,  # 限制CPU线程数，适合低配置
+                    'max_text_length': 25  # 限制文本长度以节省内存
                 }
                 
-                # 只在支持的情况下添加可选参数
-                if paddle_config.get('use_angle_cls', True):
-                    try:
-                        init_params['use_textline_orientation'] = True
-                    except:
-                        pass  # 如果不支持就忽略
+                # 尝试添加角度分类器设置（如果支持）
+                try:
+                    # 在低配置服务器上禁用角度分类器以节省资源
+                    init_params['use_angle_cls'] = False
+                except:
+                    pass
                 
+                # 尝试添加文本方向设置（如果支持）
+                try:
+                    if paddle_config.get('use_angle_cls', False):  # 默认关闭以节省资源
+                        init_params['use_textline_orientation'] = True
+                except:
+                    pass
+                
+                print("正在初始化PaddleOCR（低配置模式）...")
                 self.paddle_ocr = PaddleOCR(**init_params)
                 print("PaddleOCR 初始化成功")
             return True
@@ -215,19 +227,48 @@ class OCRHandler(http.server.SimpleHTTPRequestHandler):
             return {"error": str(e)}
     
     def process_paddle_ocr(self, image_base64, config):
-        """处理PaddleOCR识别"""
+        """处理PaddleOCR识别（低配置优化版本）"""
         try:
             if not self.init_paddle_ocr(config):
                 return {"error": "PaddleOCR初始化失败"}
             
             # 将base64图片转换为numpy数组
             image_data = base64.b64decode(image_base64)
-            image = Image.open(io.BytesIO(image_data))
-            image_np = np.array(image)
             
-            # 使用PaddleOCR进行识别
+            # 检查图片大小，如果太大则压缩以节省内存
+            if len(image_data) > 2 * 1024 * 1024:  # 2MB
+                print("图片较大，正在压缩以适应低配置服务器...")
+                image = Image.open(io.BytesIO(image_data))
+                # 限制图片最大尺寸
+                max_size = (1024, 1024)
+                image.thumbnail(max_size, Image.Resampling.LANCZOS)
+                
+                # 转换为RGB模式以确保兼容性
+                if image.mode != 'RGB':
+                    image = image.convert('RGB')
+                    
+                image_np = np.array(image)
+            else:
+                image = Image.open(io.BytesIO(image_data))
+                if image.mode != 'RGB':
+                    image = image.convert('RGB')
+                image_np = np.array(image)
+            
+            # 使用PaddleOCR进行识别（禁用角度分类以节省资源）
             start_time = time.time()
-            ocr_result = self.paddle_ocr.ocr(image_np, cls=config.get('use_textline_orientation', True))
+            try:
+                ocr_result = self.paddle_ocr.ocr(image_np, cls=False)  # 禁用角度分类
+            except Exception as e:
+                print(f"OCR识别时出错，尝试降级处理: {e}")
+                # 如果出错，尝试进一步压缩图片
+                if image_np.shape[0] > 512 or image_np.shape[1] > 512:
+                    image_small = Image.fromarray(image_np)
+                    image_small.thumbnail((512, 512), Image.Resampling.LANCZOS)
+                    image_np = np.array(image_small)
+                    ocr_result = self.paddle_ocr.ocr(image_np, cls=False)
+                else:
+                    raise e
+                    
             end_time = time.time()
             
             print(f"PaddleOCR识别耗时: {end_time - start_time:.2f}秒")
@@ -251,6 +292,12 @@ class OCRHandler(http.server.SimpleHTTPRequestHandler):
             }
             
             print(f"PaddleOCR识别结果: 共{len(words_result)}行文字")
+            
+            # 清理内存
+            del image_data, image_np
+            if 'image' in locals():
+                del image
+                
             return result
             
         except Exception as e:

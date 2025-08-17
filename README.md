@@ -19,11 +19,40 @@
 
 ## 🚀 快速开始
 
+### 环境准备
 
-### 本地部署
+#### 使用UV（推荐）
+本项目已配置使用[uv](https://github.com/astral-sh/uv)进行Python环境管理。
 
+1. **安装uv**：
+   ```bash
+   # Windows (PowerShell)
+   irm https://astral.sh/uv/install.ps1 | iex
+   
+   # macOS/Linux
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
 
-#### 完整功能（包含OCR识别）
+2. **初始化项目**：
+   ```bash
+   # 进入项目目录
+   cd wwuid词条分数计算器
+   
+   # 创建虚拟环境并安装所有依赖
+   uv sync
+   
+   # 激活虚拟环境
+   uv venv activate
+   ```
+
+3. **运行项目**：
+   ```bash
+   uv run python server.py
+   # 或指定端口
+   uv run python server.py 8001
+   ```
+
+#### 传统方式（备用）
 1. 克隆或下载项目文件
 2. 配置OCR：
    - 复制 `ocr-config.json.example` 为 `ocr-config.json`
@@ -144,7 +173,11 @@ wwscore/
 ├── server.py               # Python服务器（OCR API调用）
 ├── ocr-config.json         # OCR配置文件
 ├── ocr-config.json.example # OCR配置文件示例
-├── requirements.txt        # Python依赖文件
+├── requirements.txt        # Python依赖文件（传统方式）
+├── pyproject.toml          # UV项目配置
+├── uv.lock                 # UV依赖锁定文件
+├── .python-version         # Python版本指定
+├── UV_SETUP.md             # UV使用指南
 ├── character/              # 角色配置目录
 │   ├── 角色名/
 │   │   └── calc.json       # 角色配置文件

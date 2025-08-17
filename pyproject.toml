@@ -1,0 +1,48 @@
+[project]
+name = "wwuid词条分数计算器"
+version = "1.0.0"
+description = "基于WutheringWavesUID的词条分数计算器"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    {name = "wwuid", email = "wwuid@example.com"},
+]
+dependencies = [
+    "flask>=2.0.0",
+    "paddlepaddle>=2.5.0",
+    "paddleocr>=2.7.0",
+    "pillow>=9.0.0",
+    "numpy>=1.21.0",
+    "opencv-python>=4.5.0",
+    "requests>=2.25.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=22.0.0",
+    "isort>=5.10.0",
+    "flake8>=4.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/tyql688/WutheringWavesUID"
+Repository = "https://github.com/tyql688/WutheringWavesUID"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

@@ -8,7 +8,7 @@
 body {
     font-family: 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
-                url('https://pic1.imgdb.cn/item/688988fc58cb8da5c8eee4ab.png');
+                url('https://pic1.imgdb.cn/item/68a1825f58cb8da5c82a212b.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -21,14 +21,15 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 15px;
-    height: 100vh;
+    padding: 0 15px 20px 15px;
+    height: calc(100vh - 20px);
     display: flex;
     flex-direction: column;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-radius: 0;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
 }
 
 /* 头部样式 - 紧凑版 */
@@ -198,6 +199,47 @@ header p {
 
 .template-content::-webkit-scrollbar-thumb {
     background: rgba(102, 126, 234, 0.7);
+}
+
+/* 页脚样式 */
+.footer {
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    margin-top: 15px;
+    padding: 15px;
+    text-align: center;
+}
+
+.footer-content p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.footer-content a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.footer-content a:hover {
+    text-decoration: underline;
+}
+
+/* 响应式页脚 */
+@media (max-width: 768px) {
+    .footer {
+        margin: 10px 15px 20px 15px;
+        border-radius: 10px;
+    }
+    
+    .footer-content p {
+        font-size: 12px;
+    }
+}
     border-radius: 5px;
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
